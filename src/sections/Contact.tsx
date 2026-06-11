@@ -19,7 +19,7 @@ const EMAILJS_TEMPLATE_ID = import.meta.env.VITE_TEMPLATE_ID
 const EMAILJS_PUBLIC_KEY = import.meta.env.VITE_PUBLIC_KEY
 
 const CONTACT_EMAIL = "helprupakrc@gmail.com"
-const PHONE_NUMBER = "+91 7384348736"
+const PHONE_NUMBER = "+91 9732262005"
 
 type SubmitStatus = "idle" | "sending" | "success" | "error"
 
