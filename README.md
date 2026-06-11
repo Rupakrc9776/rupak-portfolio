@@ -2,6 +2,10 @@
 
 A modern developer portfolio showcasing my projects, certifications, open-source contributions, technical skills, and achievements.
 
+## Live Portfolio
+
+https://rupak-chatterjee.vercel.app
+
 ## Highlights
 
 - Electrical Engineering Student
@@ -20,7 +24,3 @@ A modern developer portfolio showcasing my projects, certifications, open-source
 ## Tech Stack
 
 React • TypeScript • Tailwind CSS • Vite
-
-## Live Portfolio
-
-Coming Soon
