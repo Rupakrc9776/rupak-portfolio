@@ -1,0 +1,45 @@
+{
+  "name": "portfolio-1",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc -b && vite build",
+    "lint": "eslint .",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@emailjs/browser": "^4.4.1",
+    "@icons-pack/react-simple-icons": "^13.8.0",
+    "@react-three/drei": "^10.7.6",
+    "@react-three/postprocessing": "^3.0.4",
+    "@tailwindcss/vite": "^4.1.13",
+    "axios": "^1.17.0",
+    "framer-motion": "^12.23.12",
+    "gsap": "^3.13.0",
+    "interactjs": "^1.10.27",
+    "matter-js": "^0.20.0",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0",
+    "react-icons": "^5.6.0",
+    "split-type": "^0.3.4",
+    "tailwindcss": "^4.1.13"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.33.0",
+    "@types/matter-js": "^0.20.2",
+    "@types/node": "^24.10.0",
+    "@types/react": "^19.1.10",
+    "@types/react-dom": "^19.1.7",
+    "@vitejs/plugin-react": "^5.0.0",
+    "baseline-browser-mapping": "^2.8.32",
+    "eslint": "^9.33.0",
+    "eslint-plugin-react-hooks": "^5.2.0",
+    "eslint-plugin-react-refresh": "^0.4.20",
+    "globals": "^16.3.0",
+    "typescript": "~5.8.3",
+    "typescript-eslint": "^8.39.1",
+    "vite": "^7.1.2"
+  }
+}
