@@ -622,6 +622,10 @@ const AchievementsGrid = memo(function AchievementsGrid() {
   ]
 
   const [isTouch, setIsTouch] = useState(false)
+  const [selectedCertificate, setSelectedCertificate] = useState<{
+    image: string
+    title: string
+  } | null>(null)
   useEffect(() => {
     if (typeof window === "undefined") return
     setIsTouch(("ontouchstart" in window) || (navigator.maxTouchPoints ?? 0) > 0)
@@ -647,11 +651,6 @@ const AchievementsGrid = memo(function AchievementsGrid() {
     }
   }, [])
 
-  const onItemClick = (idx: number) => {
-    if (!isTouch) return
-    setOpenIndex((prev) => (prev === idx ? null : idx))
-  }
-
   return (
     <motion.div
       ref={containerRef}
@@ -673,7 +672,12 @@ const AchievementsGrid = memo(function AchievementsGrid() {
             transition={{ duration: 0.25 }}
             className="group relative rounded-xl border border-white/20 bg-white/10 backdrop-blur-xl overflow-hidden cursor-pointer shadow-[0_10px_30px_rgba(255,255,255,0.06)]"
             style={{ minHeight: 140 }}
-            onClick={() => onItemClick(idx)}
+            onClick={() =>
+              setSelectedCertificate({
+                image: item.image,
+                title: item.title,
+              })
+            }
           >
             {/* Text content – always visible */}
             <div className="relative z-10 p-3.5">
@@ -731,9 +735,54 @@ const AchievementsGrid = memo(function AchievementsGrid() {
           </motion.div>
         )
       })}
+      <AnimatePresence>
+        {selectedCertificate && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[9999] bg-black/95 flex items-center justify-center p-4 overflow-auto"
+            onClick={() => setSelectedCertificate(null)}
+          >
+            <motion.div
+              initial={{ scale: 0.9 }}
+              animate={{ scale: 1 }}
+              exit={{ scale: 0.9 }}
+              onClick={(e) => e.stopPropagation()}
+              className="relative max-w-6xl w-full flex flex-col items-center"
+            >
+              <button
+                onClick={() => setSelectedCertificate(null)}
+                className="fixed top-5 right-5 z-[10001] bg-red-500/40 backdrop-blur-md text-white px-4 py-2 rounded-lg border border-red-400/30"
+              >
+                ✕
+              </button>
+
+              <a
+                href={selectedCertificate.image}
+                download
+                className="fixed top-5 left-5 z-[10001] bg-cyan-500/20 backdrop-blur-xl border border-cyan-400/30 text-cyan-100 px-4 py-2 rounded-xl shadow-lg hover:bg-cyan-500/30 transition-all duration-300"
+              >
+                Download
+              </a>
+
+              <img
+                src={selectedCertificate.image}
+                alt={selectedCertificate.title}
+                className="max-w-full max-h-[65vh] object-contain rounded-xl mx-auto"
+              />
+
+              <div className="mt-3 text-center text-white font-semibold">
+                {selectedCertificate.title}
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </motion.div>
   )
 })
+
 
 
 /* -------------------------

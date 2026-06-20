@@ -514,7 +514,7 @@ export default function Hero() {
             <a href="#contact" className="px-8 py-3 rounded-full bg-white text-black font-medium hover:scale-105 transition-transform">
               Contact Me
             </a>
-            <a download href="/Resume.pdf" target="_blank" rel="noreferrer" className="px-8 py-3 rounded-full border border-white/30 hover:bg-white/10 transition-colors">
+            <a href="/Resume.pdf" target="_blank" rel="noreferrer" className="px-8 py-3 rounded-full border border-white/30 hover:bg-white/10 transition-colors">
               My Resume
             </a>
           </div>
