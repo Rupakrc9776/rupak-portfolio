@@ -21,9 +21,9 @@ type Project = {
 };
 
 const projects: Project[] = [
-  { id: 1, title: "Smart Energy Monitoring & Theft Detection System Using ESP32", category: "IoT & Embedded Systems", description: "An ESP32-based Smart Energy Monitoring and Theft Detection System designed to monitor real-time voltage, current, power consumption, and detect abnormal energy usage patterns. The system integrates IoT technology using Blynk for remote monitoring and instant alerts, helping users improve energy efficiency and identify potential electricity theft.", features: ["Real-time Voltage, Current & Power Monitoring","Energy Theft Detection using Abnormal Usage Analysis","IoT Dashboard with Blynk Integration","Remote Monitoring via Smartphone","Instant Alert Notifications","Low-Cost Smart Energy Management Solution"], technologies: ["ESP32","Arduino IDE","Blynk IoT","Embedded C","IoT","Energy Monitoring"], image: p1, githubUrl: "https://github.com/Rupakrc9776/Smart-Energy-Monitoring-Theft-Detection-System-Using-ESP-32", liveUrl: "", gradientFrom: "#06b6d4", gradientTo: "#3b82f6" },
-  { id: 2, title: "Power Consumption Analyzer", category: "Electrical Engineering + Python", description: "A Python-based energy analytics tool that analyzes appliance power consumption, estimates electricity costs, identifies peak load usage, and generates optimized schedules for efficient energy management.", features: ["Energy Consumption Analysis","Electricity Cost Estimation","Peak Load Detection","Load Scheduling Optimization","CSV Data Processing"], technologies: ["Python","Pandas","Matplotlib","Numpy","CSV"], image: p2, githubUrl: "https://github.com/Rupakrc9776/power-consumption-analyzer", liveUrl: "", gradientFrom: "#06d47b", gradientTo: "#8b5cf6" },
-  { id: 3, title: "Career & Skills Advisor", category: "AI / Career Guidance", description: "An intelligent career recommendation platform built using Python and Streamlit. It analyzes user interests and skills to suggest suitable career paths, learning resources, and growth opportunities.", features: ["Career Recommendation Engine","Skills Assessment","Personalized Suggestions","Interactive Dashboard","User-Friendly Interface"], technologies: ["Python","Streamlit","JSON","Data Analysis"], image: p3, githubUrl: "https://github.com/Rupakrc9776/career-advisor-neurovolt", liveUrl: "https://career-advisor-neurovolt.streamlit.app/", gradientFrom: "#f59e0b", gradientTo: "#ef4444" },
+  { id: 1, title: "Smart Energy Monitoring & Theft Detection System Using ESP32", category: "IoT & Embedded Systems", description: "An ESP32-based Smart Energy Monitoring and Theft Detection System designed to monitor real-time voltage, current, power consumption, and detect abnormal energy usage patterns. The system integrates IoT technology using Blynk for remote monitoring and instant alerts, helping users improve energy efficiency and identify potential electricity theft.", features: ["Real-time Voltage, Current & Power Monitoring", "Energy Theft Detection using Abnormal Usage Analysis", "IoT Dashboard with Blynk Integration", "Remote Monitoring via Smartphone", "Instant Alert Notifications", "Low-Cost Smart Energy Management Solution"], technologies: ["ESP32", "Arduino IDE", "Blynk IoT", "Embedded C", "IoT", "Energy Monitoring"], image: p1, githubUrl: "https://github.com/Rupakrc9776/Smart-Energy-Monitoring-Theft-Detection-System-Using-ESP-32", liveUrl: "", gradientFrom: "#06b6d4", gradientTo: "#3b82f6" },
+  { id: 2, title: "Power Consumption Analyzer", category: "Electrical Engineering + Python", description: "A Python-based energy analytics tool that analyzes appliance power consumption, estimates electricity costs, identifies peak load usage, and generates optimized schedules for efficient energy management.", features: ["Energy Consumption Analysis", "Electricity Cost Estimation", "Peak Load Detection", "Load Scheduling Optimization", "CSV Data Processing"], technologies: ["Python", "Pandas", "Matplotlib", "Numpy", "CSV"], image: p2, githubUrl: "https://github.com/Rupakrc9776/power-consumption-analyzer", liveUrl: "", gradientFrom: "#06d47b", gradientTo: "#8b5cf6" },
+  { id: 3, title: "Career & Skills Advisor", category: "AI / Career Guidance", description: "An intelligent career recommendation platform built using Python and Streamlit. It analyzes user interests and skills to suggest suitable career paths, learning resources, and growth opportunities.", features: ["Career Recommendation Engine", "Skills Assessment", "Personalized Suggestions", "Interactive Dashboard", "User-Friendly Interface"], technologies: ["Python", "Streamlit", "JSON", "Data Analysis"], image: p3, githubUrl: "https://github.com/Rupakrc9776/career-advisor-neurovolt", liveUrl: "https://career-advisor-neurovolt.streamlit.app/", gradientFrom: "#f59e0b", gradientTo: "#ef4444" },
 ];
 
 export default function ProjectsSection() {
@@ -33,6 +33,22 @@ export default function ProjectsSection() {
   const sectionRef = useRef<HTMLElement>(null);
 
   const currentProject = projects[activeIndex];
+  const isLight =
+    document.documentElement.classList.contains("light");
+  const [, forceUpdate] = useState(0);
+
+  useEffect(() => {
+    const observer = new MutationObserver(() => {
+      forceUpdate((v) => v + 1);
+    });
+
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ["class"],
+    });
+
+    return () => observer.disconnect();
+  }, []);
 
   const nextProject = () => {
     if (isAnimating) return;
@@ -73,40 +89,43 @@ export default function ProjectsSection() {
   return (
     <section
       ref={sectionRef}
-      className="relative min-h-screen w-full bg-[#0a0a0a] overflow-hidden flex items-center justify-center py-10"
+      className={`relative min-h-screen w-full overflow-hidden flex items-center justify-center py-10 transition-colors duration-300 ${isLight ? "bg-[#f8fafc]" : "bg-[#0a0a0a]"}`}
       id="projects"
     >
       {/* Animated Background */}
       <div className="absolute inset-0 z-0">
         <div
-          className="absolute rounded-full opacity-20 blur-3xl transition-all duration-1000"
+          className="absolute rounded-full opacity: isLight ? 0.18 : 0.22 transition-all duration-1000"
           style={{
             // fluid size using clamp, and container-based transform
             width: "clamp(12rem, 25vw, 24rem)",
             height: "clamp(12rem, 25vw, 24rem)",
             top: "15%",
             left: "12%",
-            background: `radial-gradient(circle, ${currentProject.gradientFrom}, transparent)`,
+            background: `radial-gradient(circle, ${currentProject.gradientFrom}99 0%, ${currentProject.gradientFrom}55 20%, transparent 75%)`,
+            filter: isLight ? "blur(80px)" : "blur(65px)",
             transform: `translate(${mousePosition.x * 30}px, ${mousePosition.y * 30}px)`,
           }}
         />
         <div
-          className="absolute rounded-full opacity-20 blur-3xl transition-all duration-1000"
+          className="absolute rounded-full opacity: isLight ? 0.18 : 0.22 transition-all duration-1000"
           style={{
             width: "clamp(12rem, 25vw, 24rem)",
             height: "clamp(12rem, 25vw, 24rem)",
             bottom: "15%",
             right: "12%",
-            background: `radial-gradient(circle, ${currentProject.gradientTo}, transparent)`,
+            background: `radial-gradient(circle, ${currentProject.gradientTo}99 0%, ${currentProject.gradientTo}55 20%, transparent 75%)`,
+            filter: isLight ? "blur(80px)" : "blur(65px)",
             transform: `translate(${-mousePosition.x * 20}px, ${-mousePosition.y * 20}px)`,
           }}
         />
         <div
-          className="absolute inset-0 opacity-[0.03]"
+          className={`absolute inset-0 ${isLight ? "opacity-[0.12]" : "opacity-[0.06]"
+            }`}
           style={{
-            backgroundImage:
-              "linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px)",
-            backgroundSize: "50px 50px",
+            backgroundImage: isLight
+              ? "linear-gradient(rgba(0,0,0,.08) 1px, transparent 1px),linear-gradient(90deg,rgba(0,0,0,.08) 1px, transparent 1px)"
+              : "linear-gradient(rgba(255,255,255,.10) 1px, transparent 1px),linear-gradient(90deg,rgba(255,255,255,.10) 1px, transparent 1px)"
           }}
         />
       </div>
@@ -120,13 +139,15 @@ export default function ProjectsSection() {
               Portfolio
             </span>
           </div>
-          <h2 className="text-4xl md:text-6xl lg:text-7xl font-bold text-white mb-4 tracking-tight">
+          <h2
+            className={`text-4xl md:text-6xl lg:text-7xl font-bold mb-4 tracking-tight ${isLight ? "text-gray-900" : "text-white"}`}
+          >
             Featured{" "}
             <span className="bg-gradient-to-r from-cyan-400 via-blue-500 to-purple-600 bg-clip-text text-transparent">
               Projects
             </span>
           </h2>
-          <p className="text-gray-400 text-base md:text-lg max-w-2xl mx-auto">
+          <p className={`text-base md:text-lg max-w-2xl mx-auto ${isLight ? "text-gray-600" : "text-gray-400"}`}>
             Explore my latest work showcasing modern web technologies and creative solutions
           </p>
         </div>
@@ -149,11 +170,20 @@ export default function ProjectsSection() {
                     background: `linear-gradient(135deg, ${currentProject.gradientFrom}, ${currentProject.gradientTo})`,
                   }}
                 >
-                  <div className="w-full h-full bg-[#0a0a0a] rounded-3xl" />
+                  <div
+                    className={`w-full h-full rounded-3xl ${isLight ? "bg-white shadow-xl" : "bg-[#0a0a0a]"}`}
+                  />
                 </div>
 
                 {/* Image container with aspect-ratio for fluid height */}
-                <div className="relative z-10 rounded-3xl overflow-hidden w-full aspect-[4/3] sm:aspect-[3/2] md:aspect-video lg:aspect-[16/10]">
+                <div
+                  className="relative z-10 rounded-3xl overflow-hidden w-full aspect-[4/3] sm:aspect-[3/2] md:aspect-video lg:aspect-[16/10]"
+                  style={{
+                    boxShadow: isLight
+                      ? `0 0 120px ${currentProject.gradientFrom}40`
+                      : `0 0 80px ${currentProject.gradientFrom}30`,
+                  }}
+                >
                   <img
                     key={currentProject.id}
                     src={currentProject.image}
@@ -166,6 +196,7 @@ export default function ProjectsSection() {
                 <div
                   className="absolute inset-0 opacity-30 mix-blend-overlay rounded-3xl transition-opacity duration-700 pointer-events-none"
                   style={{
+                    opacity: isLight ? 0.20 : 0.35,
                     background: `linear-gradient(135deg, ${currentProject.gradientFrom}40, ${currentProject.gradientTo}40)`,
                   }}
                 />
@@ -176,7 +207,7 @@ export default function ProjectsSection() {
             <div className="space-y-6 order-1 lg:order-2 lg:col-span-2">
               <div key={`category-${currentProject.id}`} className="inline-block animate-slideInRight">
                 <span
-                  className="px-4 py-2 rounded-full text-xs md:text-sm font-semibold text-white border"
+                  className={`px-4 py-2 rounded-full text-xs md:text-sm font-semibold border ${isLight ? "text-cyan-700" : "text-white"}`}
                   style={{
                     borderColor: currentProject.gradientFrom,
                     background: `${currentProject.gradientFrom}15`,
@@ -188,7 +219,7 @@ export default function ProjectsSection() {
 
               <h3
                 key={`title-${currentProject.id}`}
-                className="text-3xl md:text-4xl lg:text-5xl font-bold text-white leading-tight animate-slideInRight"
+                className={`text-3xl md:text-4xl lg:text-5xl font-bold ${isLight ? "text-gray-900" : "text-white"} leading-tight animate-slideInRight`}
                 style={{ animationDelay: "0.1s" }}
               >
                 {currentProject.title}
@@ -196,17 +227,17 @@ export default function ProjectsSection() {
 
               <p
                 key={`desc-${currentProject.id}`}
-                className="text-gray-300 text-base md:text-lg leading-relaxed animate-slideInRight"
+                className={`${isLight ? "text-gray-700" : "text-gray-300"} text-base md:text-lg leading-relaxed animate-slideInRight`}
                 style={{ animationDelay: "0.2s" }}
               >
                 {currentProject.description}
               </p>
 
               <div key={`features-${currentProject.id}`} className="space-y-2 animate-slideInRight" style={{ animationDelay: "0.25s" }}>
-                <h4 className="text-sm font-semibold text-gray-400 uppercase tracking-wider">Key Features</h4>
+                <h4 className={`text-sm font-semibold ${isLight ? "text-gray-600" : "text-gray-400"} uppercase tracking-wider`}>Key Features</h4>
                 <ul className="space-y-2">
                   {currentProject.features.map((feature, index) => (
-                    <li key={index} className="flex items-start gap-2 text-gray-300 text-sm md:text-base">
+                    <li key={index} className={`flex items-start gap-2 ${isLight ? "text-gray-700" : "text-gray-300"}`} style={{ animationDelay: "0.3s" }}>
                       <svg className="w-5 h-5 mt-0.5 flex-shrink-0" style={{ color: currentProject.gradientFrom }} fill="currentColor" viewBox="0 0 20 20">
                         <path
                           fillRule="evenodd"
@@ -221,12 +252,15 @@ export default function ProjectsSection() {
               </div>
 
               <div key={`tech-${currentProject.id}`} className="space-y-2 animate-slideInRight" style={{ animationDelay: "0.3s" }}>
-                <h4 className="text-sm font-semibold text-gray-400 uppercase tracking-wider">Tech Stack</h4>
+                <h4 className={`text-sm font-semibold ${isLight ? "text-gray-600" : "text-gray-400"} uppercase tracking-wider`}>Tech Stack</h4>
                 <div className="flex flex-wrap gap-2">
                   {currentProject.technologies.map((tech, index) => (
                     <span
                       key={index}
-                      className="px-3 md:px-4 py-1.5 md:py-2 bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg text-xs md:text-sm text-gray-300 font-medium transition-all duration-300 hover:scale-105 backdrop-blur-sm"
+                      className={`px-3 md:px-4 py-1.5 md:py-2 rounded-lg text-xs md:text-sm font-medium transition-all duration-300 hover:scale-105 backdrop-blur-sm ${isLight
+                        ? "bg-white border border-gray-300 text-gray-800 hover:bg-gray-100"
+                        : "bg-white/5 border border-white/10 text-gray-300 hover:bg-white/10"
+                        }`}
                     >
                       {tech}
                     </span>
@@ -241,21 +275,24 @@ export default function ProjectsSection() {
                     target="_blank"
                     rel="noopener noreferrer"
                     className="group inline-flex items-center gap-2 px-5 md:px-6 py-2.5 md:py-3 rounded-full font-semibold text-sm md:text-base text-white transition-all duration-300 hover:scale-105 active:scale-95 shadow-lg hover:shadow-2xl"
-                  style={{ background: `linear-gradient(135deg, ${currentProject.gradientFrom}, ${currentProject.gradientTo})` }}
-                >
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                  </svg>
-                  <span>Live Preview</span>
-                </a>
-              )}
+                    style={{ background: `linear-gradient(135deg, ${currentProject.gradientFrom}, ${currentProject.gradientTo})` }}
+                  >
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                    </svg>
+                    <span>Live Preview</span>
+                  </a>
+                )}
 
                 <a
                   href={currentProject.githubUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="group inline-flex items-center gap-2 px-5 md:px-6 py-2.5 md:py-3 rounded-full font-semibold text-sm md:text-base text-white bg-white/5 hover:bg-white/10 border border-white/10 transition-all duration-300 hover:scale-105 active:scale-95 backdrop-blur-sm"
+                  className={`group inline-flex items-center gap-2 px-5 md:px-6 py-2.5 md:py-3 rounded-full font-semibold text-sm md:text-base transition-all duration-300 hover:scale-105 active:scale-95 backdrop-blur-sm ${isLight
+                    ? "bg-white border border-gray-300 text-gray-900 hover:bg-gray-100"
+                    : "bg-white/5 border border-white/10 text-white hover:bg-white/10"
+                    }`}
                 >
                   <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
                     <path
@@ -274,7 +311,10 @@ export default function ProjectsSection() {
           <button
             onClick={prevProject}
             disabled={isAnimating}
-            className="absolute inset-y-0 left-0 my-auto w-11 h-11 sm:w-12 sm:h-12 md:w-14 md:h-14 rounded-full bg-white/5 hover:bg-white/10 backdrop-blur-md border border-white/10 flex items-center justify-center text-white transition-all duration-300 hover:scale-110 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed group z-20"
+            className={`absolute inset-y-0 left-0 my-auto w-11 h-11 sm:w-12 sm:h-12 md:w-14 md:h-14 rounded-full backdrop-blur-md flex items-center justify-center transition-all duration-300 hover:scale-110 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed group z-20 ${isLight
+              ? "bg-white border border-gray-300 text-gray-900"
+              : "bg-white/5 border border-white/10 text-white hover:bg-white/10"
+              }`}
             aria-label="Previous project"
             style={{
               // keep arrow inside container using clamp() based padding
@@ -290,7 +330,10 @@ export default function ProjectsSection() {
           <button
             onClick={nextProject}
             disabled={isAnimating}
-            className="absolute inset-y-0 right-0 my-auto w-11 h-11 sm:w-12 sm:h-12 md:w-14 md:h-14 rounded-full bg-white/5 hover:bg-white/10 backdrop-blur-md border border-white/10 flex items-center justify-center text-white transition-all duration-300 hover:scale-110 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed group z-20"
+            className={`absolute inset-y-0 right-0 my-auto w-11 h-11 sm:w-12 sm:h-12 md:w-14 md:h-14 rounded-full backdrop-blur-md flex items-center justify-center transition-all duration-300 hover:scale-110 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed group z-20 ${isLight
+              ? "bg-white border border-gray-300 text-gray-900"
+              : "bg-white/5 border border-white/10 text-white hover:bg-white/10"
+              }`}
             aria-label="Next project"
             style={{
               transform: "translateY(0)",
@@ -324,7 +367,9 @@ export default function ProjectsSection() {
                   background:
                     index === activeIndex
                       ? `linear-gradient(90deg, ${project.gradientFrom}, ${project.gradientTo})`
-                      : "rgba(255,255,255,0.2)",
+                      : isLight
+                        ? "rgba(0,0,0,0.25)"
+                        : "rgba(255,255,255,0.2)",
                 }}
               />
             </button>
@@ -333,7 +378,7 @@ export default function ProjectsSection() {
 
         {/* Project Counter */}
         <div className="text-center mt-6 md:mt-8 text-sm md:text-base text-gray-500 font-medium">
-          <span className="text-white">{String(activeIndex + 1).padStart(2, "0")}</span> / {String(projects.length).padStart(2, "0")}
+          <span className={`${isLight ? "text-gray-900" : "text-white"}`}>{String(activeIndex + 1).padStart(2, "0")}</span> / {String(projects.length).padStart(2, "0")}
         </div>
       </div>
 

@@ -1,4 +1,3 @@
-
 import { useEffect, useRef, useState } from 'react'
 import { useReducedMotion } from 'framer-motion'
 
@@ -21,6 +20,7 @@ export default function GlobalLayers({ showCursorGlow = true }: { showCursorGlow
   const canvasRef = useRef<HTMLCanvasElement | null>(null)
   const prefersReduced = useReducedMotion()
   const [theme, setTheme] = useState<SectionTheme>(sectionThemes.default)
+  const [isLight, setIsLight] = useState(false)
 
   // Listen for section-enter events to change theme
   useEffect(() => {
@@ -30,6 +30,23 @@ export default function GlobalLayers({ showCursorGlow = true }: { showCursorGlow
     }
     document.addEventListener('section-enter', handleEnter)
     return () => document.removeEventListener('section-enter', handleEnter)
+  }, [])
+
+  useEffect(() => {
+    const updateTheme = () => {
+      setIsLight(document.documentElement.classList.contains("light"))
+    }
+
+    updateTheme()
+
+    const observer = new MutationObserver(updateTheme)
+
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ["class"],
+    })
+
+    return () => observer.disconnect()
   }, [])
 
   // Dust canvas (guarded for reduced motion and small screens)
@@ -66,7 +83,9 @@ export default function GlobalLayers({ showCursorGlow = true }: { showCursorGlow
     const draw = () => {
       ctx.clearRect(0, 0, w, h)
       ctx.globalCompositeOperation = 'lighter'
-      ctx.fillStyle = 'rgba(255,255,255,0.10)'
+      ctx.fillStyle = isLight
+        ? 'rgba(0,0,0,0.06)'
+        : 'rgba(255,255,255,0.10)'
       for (let i = 0; i < N; i++) {
         const p = P[i]
         p.x += p.vx
@@ -90,7 +109,7 @@ export default function GlobalLayers({ showCursorGlow = true }: { showCursorGlow
       cancelAnimationFrame(raf)
       window.removeEventListener('resize', onResize)
     }
-  }, [prefersReduced])
+  }, [prefersReduced, isLight])
 
   return (
     <>
@@ -98,24 +117,31 @@ export default function GlobalLayers({ showCursorGlow = true }: { showCursorGlow
       <div className="absolute inset-0 -z-10" aria-hidden>
         <div
           data-plane
-          className="absolute -left-24 -top-16 w-[60rem] h-[28rem] rounded-[48px] opacity-[0.20]"
+          className={`absolute -left-24 -top-16 w-[60rem] h-[28rem] rounded-[48px] ${isLight ? "opacity-[0.10]" : "opacity-[0.20]"
+            }`}
           style={{ background: `radial-gradient(closest-side, ${theme.a}, transparent 65%)`, filter: 'blur(24px)' }}
         />
         <div
           data-plane
-          className="absolute right-[-18rem] top-[8rem] w-[56rem] h-[28rem] rounded-[48px] opacity-[0.20]"
+          className={`absolute right-[-18rem] top-[8rem] w-[56rem] h-[28rem] rounded-[48px] ${isLight ? "opacity-[0.10]" : "opacity-[0.20]"
+            }`}
           style={{ background: `radial-gradient(closest-side, ${theme.b}, transparent 65%)`, filter: 'blur(24px)' }}
         />
         <div
           data-plane
-          className="absolute left-[10%] bottom-[8%] w-[36rem] h-[20rem] rounded-[48px] opacity-[0.20]"
+          className={`absolute left-[10%] bottom-[8%] w-[36rem] h-[20rem] rounded-[48px] ${isLight ? "opacity-[0.10]" : "opacity-[0.20]"
+            }`}
           style={{ background: `radial-gradient(closest-side, ${theme.c}, transparent 65%)`, filter: 'blur(22px)' }}
         />
 
         {/* subtle bottom vignette */}
         <div
           className="absolute left-0 bottom-0 right-0 h-40 pointer-events-none"
-          style={{ background: 'linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0.45) 80%)' }}
+          style={{
+            background: isLight
+              ? "linear-gradient(180deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.55) 80%)"
+              : "linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0.45) 80%)"
+          }}
         />
 
         {/* dust canvas */}

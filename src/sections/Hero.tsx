@@ -1,4 +1,3 @@
-
 import { useEffect, useLayoutEffect, useMemo, useRef, useCallback, useState } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
@@ -12,20 +11,31 @@ gsap.registerPlugin(ScrollTrigger);
 
 // CSS injection for crisp grid + socials
 const gridCSS = `
-.hero-grid {
-  background-image:
-    linear-gradient(rgba(255,255,255,0.07) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255,255,255,0.07) 1px, transparent 1px),
-    radial-gradient(ellipse at 50% 120%, rgba(255,255,255,0.035), rgba(0,0,0,0) 60%);
-  background-size: 80px 80px, 80px 80px, 100% 100%;
-  background-position: 0 0, 0 0, 0 0;
-  opacity: 0.55;
-  filter: contrast(1) saturate(1.0);
-  transform: translateZ(0);
-  will-change: background-position;
+.light .hero-grid{
+background-image:
+linear-gradient(rgba(0,0,0,.05) 1px,transparent 1px),
+linear-gradient(90deg,rgba(0,0,0,.05) 1px,transparent 1px),
+radial-gradient(ellipse at 50% 120%,rgba(0,0,0,.02),transparent 60%);
+}
+
+.dark .hero-grid{
+background-image:
+linear-gradient(rgba(255,255,255,.07) 1px,transparent 1px),
+linear-gradient(90deg,rgba(255,255,255,.07) 1px,transparent 1px),
+radial-gradient(ellipse at 50% 120%,rgba(255,255,255,.035),transparent 60%);
 }
 .hero-social a { transition: transform .2s ease, color .2s ease; }
-.hero-social a:hover { transform: translateY(-2px); color: #fff; }
+.hero-social a:hover{
+  transform:translateY(-2px);
+}
+
+.dark .hero-social a:hover{
+  color:#fff;
+}
+
+.light .hero-social a:hover{
+  color:#111827;
+}
 `;
 
 // Optimized Neon gradient glow shader
@@ -86,39 +96,75 @@ extend({ NeonGlowMaterial });
 function NeonMat({ hue = 0.65, hueSpeed = 0.02, fresnel = 3.2, glow = 1.85, alpha = 1 }) {
   const materialRef = useRef<NeonGlowMaterial | THREE.MeshStandardMaterial | null>(null);
   const [useFallback, setUseFallback] = useState(false);
-  
+  const [isLight, setIsLight] = useState(
+    document.documentElement.classList.contains("light")
+  )
+
+  useEffect(() => {
+    const updateTheme = () => {
+      setIsLight(document.documentElement.classList.contains("light"))
+    }
+
+    updateTheme()
+
+    const observer = new MutationObserver(updateTheme)
+
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ["class"],
+    })
+
+    return () => observer.disconnect()
+  }, [])
   // Create material only once
-  useMemo(() => {
+  useEffect(() => {
     try {
       materialRef.current = new NeonGlowMaterial();
     } catch (error) {
       console.warn('NeonGlowMaterial failed, using fallback:', error);
       setUseFallback(true);
       materialRef.current = new THREE.MeshStandardMaterial({
-        color: new THREE.Color().setHSL(hue, 0.8, 0.6),
-        emissive: new THREE.Color().setHSL(hue, 0.5, 0.2),
+        color: new THREE.Color().setHSL(
+          hue,
+          0.8,
+          isLight ? 0.42 : 0.60
+        ),
+
+        emissive: new THREE.Color().setHSL(
+          hue,
+          0.5,
+          isLight ? 0.08 : 0.20
+        ),
         transparent: true,
         opacity: alpha,
       });
     }
-    return materialRef.current;
-  }, [hue, alpha]);
-  
+  }, [hue, alpha, isLight]);
+
   useFrame((state) => {
     if (!materialRef.current) return;
-    
+
     const t = state.clock.getElapsedTime();
     if (!useFallback && materialRef.current instanceof NeonGlowMaterial) {
       materialRef.current.uniforms.uTime.value = t;
       materialRef.current.uniforms.uHue.value = hue;
       materialRef.current.uniforms.uHueShiftSpeed.value = hueSpeed;
       materialRef.current.uniforms.uFresnelPow.value = fresnel;
-      materialRef.current.uniforms.uGlow.value = glow;
-      materialRef.current.uniforms.uAlpha.value = alpha;
+      materialRef.current.uniforms.uGlow.value = isLight ? glow * 0.85 : glow;
+      materialRef.current.uniforms.uAlpha.value = isLight ? 0.95 : alpha;
     } else if (useFallback && materialRef.current instanceof THREE.MeshStandardMaterial) {
       const animatedHue = (hue + hueSpeed * t) % 1;
-      materialRef.current.color.setHSL(animatedHue, 0.8, 0.6);
-      materialRef.current.emissive.setHSL(animatedHue, 0.5, 0.2);
+      materialRef.current.color.setHSL(
+        animatedHue,
+        0.8,
+        isLight ? 0.42 : 0.60
+      )
+
+      materialRef.current.emissive.setHSL(
+        animatedHue,
+        0.5,
+        isLight ? 0.08 : 0.20
+      )
     }
   });
 
@@ -129,7 +175,7 @@ function NeonMat({ hue = 0.65, hueSpeed = 0.02, fresnel = 3.2, glow = 1.85, alph
       }
     };
   }, []);
-  
+
   return materialRef.current ? <primitive object={materialRef.current} /> : null;
 }
 
@@ -264,7 +310,7 @@ function useDragControl() {
       -((e.clientY - gl.domElement.getBoundingClientRect().top) / gl.domElement.clientHeight) * 2 + 1
     );
     raycaster.setFromCamera(mouseVec, camera);
-    
+
     // Only raycast against cached draggable objects
     const intersects = raycaster.intersectObjects(draggableObjects.current, false);
     if (intersects.length > 0) {
@@ -339,10 +385,17 @@ function DraggableSphere({ hueDeg = 210, z = -1.5 }) {
   }, []);
 
   return (
-    <mesh ref={meshRef} position={[-2.0, 0.5, z]}>
+    <mesh ref={meshRef} position={[-2.0, 0.5, z]}
+      renderOrder={2}>
       {/* Reduced from 64x64 to 32x32 - significant performance gain */}
       <sphereGeometry args={[1.0, 32, 32]} />
-      <NeonMat hue={(hueDeg % 360) / 360} hueSpeed={0.02} fresnel={3.3} glow={1.95} />
+      <NeonMat
+        hue={(hueDeg % 360) / 360}
+        hueSpeed={0.02}
+        fresnel={3.3}
+        glow={2.2}
+        alpha={1}
+      />
     </mesh>
   );
 }
@@ -374,16 +427,36 @@ function DraggableCube({ hueDeg = 325, z = -1.5 }) {
   }, []);
 
   return (
-    <group ref={groupRef} position={[2.0, -0.5, z]}>
+    <group ref={groupRef} position={[2.0, -0.5, z]} renderOrder={2}>
       {/* Reduced smoothness from 10 to 6 */}
       <RoundedBox args={[1.4, 1.4, 1.4]} radius={0.2} smoothness={6}>
-        <NeonMat hue={(hueDeg % 360) / 360} hueSpeed={0.02} fresnel={3.1} glow={1.9} />
+        <NeonMat hue={(hueDeg % 360) / 360} hueSpeed={0.02} fresnel={3.5} glow={2.4} />
       </RoundedBox>
     </group>
   );
 }
 
 export default function Hero() {
+  const [isLight, setIsLight] = useState(
+    document.documentElement.classList.contains("light")
+  );
+
+  useEffect(() => {
+    const updateTheme = () => {
+      setIsLight(document.documentElement.classList.contains("light"));
+    };
+
+    updateTheme();
+
+    const observer = new MutationObserver(updateTheme);
+
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ["class"],
+    });
+
+    return () => observer.disconnect();
+  }, []);
   const rootRef = useRef<HTMLDivElement>(null);
   const warpRef = useRef<HTMLDivElement>(null);
   const gridRef = useRef<HTMLDivElement>(null);
@@ -461,7 +534,12 @@ export default function Hero() {
   }, []);
 
   return (
-    <section ref={rootRef} id="hero" className="relative min-h-[100svh] w-full overflow-hidden bg-black text-white">
+    <section
+      ref={rootRef}
+      id="hero"
+      aria-label="Hero Section"
+      className="relative min-h-[100svh] w-full overflow-hidden bg-[rgb(var(--bg))] text-black dark:text-white transition-colors duration-500"
+    >
       {/* Grid + runway */}
       <div ref={warpRef} className="absolute inset-0 will-change-transform">
         <div ref={gridRef} className="hero-grid absolute inset-0 pointer-events-none" />
@@ -469,10 +547,12 @@ export default function Hero() {
 
       {/* 3D scene with optimized settings */}
       <div className="absolute inset-0">
-        <Canvas 
-          camera={{ position: [0, 0, 5.5], fov: 56 }} 
+        <Canvas
+          camera={{ position: [0, 0, 5.5], fov: 56 }}
           dpr={Math.min(window.devicePixelRatio, 2)} // Cap DPR at 2
-          gl={{ 
+          gl={{
+            outputColorSpace: THREE.SRGBColorSpace,
+            toneMapping: THREE.ACESFilmicToneMapping,
             antialias: window.devicePixelRatio <= 2, // Disable AA on high DPI
             alpha: true,
             powerPreference: "high-performance",
@@ -481,20 +561,28 @@ export default function Hero() {
           }}
           frameloop="always" // Can change to "demand" if no continuous animation needed
         >
-          <ambientLight intensity={0.4} />
-          <directionalLight position={[5, 5, 5]} intensity={0.8} />
-          <directionalLight position={[-5, -5, 2]} intensity={0.3} color="#4fc3f7" />
-          
+          <ambientLight intensity={0.45} />
+          <directionalLight
+            position={[5, 5, 5]}
+            intensity={0.9}
+            color="#ffffff"
+          />
+          <directionalLight
+            position={[-5, -5, 2]}
+            intensity={0.45}
+            color="#4fc3f7"
+          />
+
           <DraggableSphere hueDeg={210} z={-1.5} />
           <DraggableCube hueDeg={325} z={-1.5} />
 
           {/* Optimized Bloom settings */}
           <EffectComposer multisampling={0}>
-            <Bloom 
-              intensity={1.15} // Reduced from 1.25
-              luminanceThreshold={0.2} // Increased from 0.18
-              radius={0.8} // Reduced from 0.9
-              mipmapBlur // Enable for better performance
+            <Bloom
+              intensity={isLight ? 0.75 : 1.6}
+              luminanceThreshold={isLight ? 0.45 : 0.2}
+              radius={isLight ? 0.35 : 0.8}
+              mipmapBlur
             />
           </EffectComposer>
         </Canvas>
@@ -503,30 +591,30 @@ export default function Hero() {
       {/* Foreground content */}
       <div className="relative hero-content z-10 flex min-h-[100svh] items-center justify-center px-6">
         <div className="text-center max-w-6xl mx-auto">
-          <h1 className="text-7xl md:text-9xl font-semibold tracking-tight">
+          <h1 className="text-5xl sm:text-6xl md:text-8xl lg:text-9xl font-semibold tracking-tight text-black dark:text-white transition-colors">
             Rupak Chatterjee
           </h1>
-          <p className="mt-6 text-gray-300 text-2xl md:text-3xl font-medium">
+          <p className="mt-6 text-gray-600 dark:text-gray-300 text-lg sm:text-xl md:text-2xl lg:text-3xl font-medium transition-colors">
             Electrical Engineering Student, Developer & Tech Enthusiast
           </p>
 
           <div className="mt-10 flex flex-wrap items-center justify-center gap-4">
-            <a href="#contact" className="px-8 py-3 rounded-full bg-white text-black font-medium hover:scale-105 transition-transform">
+            <a href="#contact" className="px-8 py-3 rounded-full bg-gradient-to-r from-cyan-500 to-blue-600 text-white hover:scale-105 hover:shadow-xl hover:shadow-cyan-500/30 transition-all duration-300">
               Contact Me
             </a>
-            <a href="/Resume.pdf" target="_blank" rel="noreferrer" className="px-8 py-3 rounded-full border border-white/30 hover:bg-white/10 transition-colors">
-              My Resume
+            <a href="/Resume.pdf" target="_blank" rel="noreferrer" className="px-8 py-3 rounded-full border border-gray-400 border border-gray-400 dark:border-white/20 backdrop-blur-md hover:bg-gray-100 dark:hover:bg-white/10 transition-all duration-300">
+              Resume ↗
             </a>
           </div>
 
-          <div className="hero-social mt-8 flex items-center justify-center gap-6 text-gray-400 text-2xl">
-            <a href="https://github.com/Rupakrc9776" target="_blank" rel="noreferrer" aria-label="GitHub" title="GitHub">
+          <div className="hero-social mt-8 flex items-center justify-center gap-6 text-gray-700 dark:text-gray-400 transition-colors text-2xl">
+            <a className="transition-all duration-300 hover:scale-110" href="https://github.com/Rupakrc9776" target="_blank" rel="noreferrer" aria-label="GitHub" title="GitHub">
               <FaGithub />
             </a>
-            <a href="https://www.linkedin.com/in/rupak-chatterjee-293bba2a6/" target="_blank" rel="noreferrer" aria-label="LinkedIn" title="LinkedIn">
+            <a className="transition-all duration-300 hover:scale-110" href="https://www.linkedin.com/in/rupak-chatterjee-293bba2a6/" target="_blank" rel="noreferrer" aria-label="LinkedIn" title="LinkedIn">
               <FaLinkedin />
             </a>
-            <a href="https://x.com/RupakRC97" target="_blank" rel="noreferrer" aria-label="Twitter" title="Twitter">
+            <a className="transition-all duration-300 hover:scale-110" href="https://x.com/RupakRC97" target="_blank" rel="noreferrer" aria-label="Twitter" title="Twitter">
               <FaTwitter />
             </a>
           </div>
@@ -535,10 +623,10 @@ export default function Hero() {
 
       {/* Scroll indicator */}
       <div className="absolute bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 z-10">
-        <div className="w-6 h-10 rounded-full border-2 border-gray-400/60 flex items-start justify-center p-1">
+        <div className="w-6 h-10 rounded-full border-2 border-gray-500 dark:border-gray-500/30 flex items-start justify-center p-1">
           <div className="w-2 h-2 rounded-full bg-cyan-400 animate-bounce" />
         </div>
-        <span className="text-xs text-gray-400">Scroll</span>
+        <span className="text-xs text-gray-700 dark:text-gray-400">Scroll</span>
       </div>
     </section>
   );

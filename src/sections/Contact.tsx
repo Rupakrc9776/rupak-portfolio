@@ -33,6 +33,23 @@ export default function Contact() {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [status, setStatus] = useState<SubmitStatus>("idle")
 
+  const [, forceUpdate] = useState(0);
+
+  useEffect(() => {
+    const observer = new MutationObserver(() => {
+      forceUpdate(v => v + 1);
+    });
+
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ["class"],
+    });
+
+    return () => observer.disconnect();
+  }, []);
+
+  const isLight = document.documentElement.classList.contains("light");
+
   // particle bg
   useEffect(() => {
     if (!particlesRef.current || typeof window === "undefined") return
@@ -200,13 +217,22 @@ export default function Contact() {
   return (
     <section
       id="contact"
-      className="relative min-h-screen flex flex-col items-center justify-center px-4 sm:px-6 md:px-8 lg:px-12 py-16 bg-black text-white overflow-hidden"
+      className={`relative min-h-screen flex flex-col items-center justify-center px-4 sm:px-6 md:px-8 lg:px-12 py-16 overflow-hidden transition-colors duration-500 ${isLight ? "bg-gradient-to-b from-white via-slate-50 to-white text-gray-900" : "bg-black text-white"}`}
     >
       {/* soft color glows, bg still black */}
       <div className="pointer-events-none absolute inset-0 -z-20">
-        <div className="absolute -top-40 -left-32 h-80 w-80 rounded-full bg-cyan-500/20 blur-3xl" />
-        <div className="absolute -bottom-32 -right-32 h-80 w-80 rounded-full bg-purple-500/25 blur-3xl" />
-        <div className="absolute top-1/2 left-1/2 h-64 w-64 -translate-x-1/2 -translate-y-1/2 rounded-full bg-pink-500/10 blur-3xl" />
+        <div
+          className={`absolute -top-40 -left-32 h-80 w-80 rounded-full blur-3xl ${isLight ? "bg-cyan-400/25" : "bg-cyan-500/20"
+            }`}
+        />
+        <div
+          className={`absolute -bottom-32 -right-32 h-80 w-80 rounded-full blur-3xl ${isLight ? "bg-purple-400/25" : "bg-purple-500/25"
+            }`}
+        />
+        <div
+          className={`absolute top-1/2 left-1/2 h-64 w-64 -translate-x-1/2 -translate-y-1/2 rounded-full blur-3xl ${isLight ? "bg-pink-400/15" : "bg-pink-500/10"
+            }`}
+        />
       </div>
 
       {/* particles */}
@@ -227,11 +253,15 @@ export default function Contact() {
         </p>
         <h2
           ref={headingRef}
-          className="text-3xl sm:text-5xl md:text-6xl font-black tracking-tight text-white"
+          className={`text-3xl sm:text-5xl md:text-6xl font-black tracking-tight ${isLight ? "text-gray-900" : "text-white"
+            }`}
         >
           Let&apos;s Build Something Epic
         </h2>
-        <p className="mt-4 max-w-2xl text-sm sm:text-base text-neutral-400 mx-auto">
+        <p
+          className={`mt-4 max-w-2xl text-sm sm:text-base mx-auto ${isLight ? "text-gray-600" : "text-neutral-400"
+            }`}
+        >
           Drop a message about your idea, collaboration, or project. Replies
           usually land within 24 hours.
         </p>
@@ -247,7 +277,7 @@ export default function Contact() {
           className="space-y-6"
         >
           <InfoCard
-            icon={<FaEnvelope className="h-4 w-4" />}
+            icon={<FaEnvelope className="h-4 w-4" />} isLight={isLight}
             label="Email"
             pillColor="from-cyan-500 to-sky-500"
           >
@@ -262,6 +292,7 @@ export default function Contact() {
 
           <InfoCard
             icon={<FaPhone className="h-4 w-4" />}
+            isLight={isLight}
             label="Phone"
             pillColor="from-emerald-500 to-lime-500"
           >
@@ -275,32 +306,42 @@ export default function Contact() {
 
           <InfoCard
             icon={<FaMapMarkerAlt className="h-4 w-4" />}
+            isLight={isLight}
             label="Location"
             pillColor="from-purple-500 to-pink-500"
           >
-            <p className="mt-1 text-sm text-neutral-300">
+            <p
+              className={`mt-1 text-sm ${isLight ? "text-gray-700" : "text-neutral-300"
+                }`}
+            >
               Remote • Available worldwide
             </p>
           </InfoCard>
 
-          <div className="mt-8 border-t border-white/10 pt-6">
-            <p className="mb-3 text-xs font-semibold uppercase tracking-[0.25em] text-neutral-400">
+          <div
+            className={`mt-8 pt-6 ${isLight ? "border-t border-gray-200" : "border-t border-white/10"
+              }`}
+          >
+            <p
+              className={`mb-3 text-xs font-semibold uppercase tracking-[0.25em] ${isLight ? "text-gray-600" : "text-neutral-400"
+                }`}
+            >
               Social
             </p>
             <div
               ref={socialIconsRef}
               className="flex flex-wrap gap-4 text-lg text-white"
             >
-              <SocialIcon href="https://github.com/Rupakrc9776">
+              <SocialIcon href="https://github.com/Rupakrc9776" isLight={isLight}>
                 <FaGithub />
               </SocialIcon>
-              <SocialIcon href="https://www.linkedin.com/in/rupak-chatterjee-293bba2a6/">
+              <SocialIcon href="https://www.linkedin.com/in/rupak-chatterjee-293bba2a6/" isLight={isLight}>
                 <FaLinkedin />
               </SocialIcon>
-              <SocialIcon href="https://x.com/RupakRC97">
+              <SocialIcon href="https://x.com/RupakRC97" isLight={isLight}>
                 <FaTwitter />
               </SocialIcon>
-              <SocialIcon href={`mailto:${CONTACT_EMAIL}`}>
+              <SocialIcon href={`mailto:${CONTACT_EMAIL}`} isLight={isLight}>
                 <FaEnvelope />
               </SocialIcon>
             </div>
@@ -317,15 +358,23 @@ export default function Contact() {
           {/* static gradient border, no rotation */}
           <div className="pointer-events-none absolute -inset-[2px] rounded-[22px] bg-[linear-gradient(135deg,#22d3ee,#a855f7,#ec4899)] opacity-80" />
           {/* inner card – much lighter for readability */}
-          <div className="relative rounded-[18px] border border-white/20 bg-white/15 p-6 sm:p-8 backdrop-blur-2xl shadow-[0_18px_60px_rgba(0,0,0,0.75)]">
-            <h3 className="mb-6 text-lg font-semibold tracking-tight text-white">
+          <div
+            className={`relative rounded-[18px] p-6 sm:p-8 backdrop-blur-2xl ${isLight
+              ? "bg-white border border-gray-200 shadow-2xl"
+              : "border border-white/20 bg-white/15 shadow-[0_18px_60px_rgba(0,0,0,0.75)]"
+              }`}
+          >
+            <h3
+              className={`text-2xl font-semibold ${isLight ? "text-gray-900" : "text-white"
+                }`}
+            >
               Send a message
             </h3>
 
             <form
               ref={formRef}
               onSubmit={handleSubmit}
-              className="space-y-5"
+              className="mt-6 space-y-5"
               noValidate
             >
               <InputField
@@ -333,17 +382,20 @@ export default function Contact() {
                 name="user_name"
                 type="text"
                 placeholder="Your name"
+                isLight={isLight}
               />
               <InputField
                 label="Email"
                 name="user_email"
                 type="email"
                 placeholder="you@example.com"
+                isLight={isLight}
               />
               <TextareaField
                 label="Message"
                 name="message"
                 placeholder="Tell me about your idea..."
+                isLight={isLight}
               />
 
               <AnimatePresence mode="wait">
@@ -387,11 +439,10 @@ export default function Contact() {
                 disabled={isSubmitting}
                 whileHover={!isSubmitting ? { scale: 1.02 } : {}}
                 whileTap={!isSubmitting ? { scale: 0.97 } : {}}
-                className={`mt-2 flex w-full items-center justify-center gap-2 rounded-2xl px-6 py-3 text-sm font-semibold uppercase tracking-[0.2em] transition ${
-                  isSubmitting
-                    ? "cursor-not-allowed bg-neutral-300 text-neutral-800"
-                    : "bg-gradient-to-r from-cyan-500 via-purple-500 to-pink-500 text-white shadow-lg shadow-cyan-500/25 hover:shadow-purple-500/40"
-                }`}
+                className={`mt-2 flex w-full items-center justify-center gap-2 rounded-2xl px-6 py-3 text-sm font-semibold uppercase tracking-[0.2em] transition ${isSubmitting
+                  ? "cursor-not-allowed bg-neutral-300 text-neutral-800"
+                  : "bg-gradient-to-r from-cyan-500 via-purple-500 to-pink-500 text-white shadow-lg shadow-cyan-500/25 hover:shadow-purple-500/40"
+                  }`}
               >
                 {isSubmitting ? (
                   <>
@@ -448,13 +499,17 @@ function InfoCard(props: {
   label: string
   pillColor: string
   children: React.ReactNode
+  isLight: boolean
 }) {
-  const { icon, label, pillColor, children } = props
+  const { icon, label, pillColor, children, isLight } = props
   return (
     <motion.div
       whileHover={{ y: -4, scale: 1.01 }}
       transition={{ duration: 0.25 }}
-      className="rounded-2xl border border-white/10 bg-white/5 p-4 backdrop-blur-xl"
+      className={`rounded-2xl p-4 backdrop-blur-xl ${isLight
+        ? "bg-white border border-gray-200"
+        : "bg-white/5 border border-white/10"
+        }`}
     >
       <div className="flex items-center gap-4">
         <div
@@ -463,7 +518,12 @@ function InfoCard(props: {
           {icon}
         </div>
         <div>
-          <p className="text-xs uppercase tracking-[0.25em] text-neutral-400">
+          <p
+            className={`text-xs uppercase tracking-[0.25em] ${isLight
+              ? "text-gray-600"
+              : "text-neutral-400"
+              }`}
+          >
             {label}
           </p>
           {children}
@@ -476,9 +536,11 @@ function InfoCard(props: {
 function SocialIcon({
   href,
   children,
+  isLight,
 }: {
   href: string
   children: React.ReactNode
+  isLight: boolean
 }) {
   return (
     <motion.a
@@ -487,7 +549,10 @@ function SocialIcon({
       rel="noopener noreferrer"
       whileHover={{ scale: 1.15, y: -4 }}
       whileTap={{ scale: 0.95 }}
-      className="flex h-11 w-11 items-center justify-center rounded-2xl border border-white/10 bg-white/5 text-white shadow-sm hover:border-cyan-400/60 hover:text-cyan-300"
+      className={`flex h-11 w-11 items-center justify-center rounded-2xl shadow-sm transition-all ${isLight
+        ? "bg-white border border-gray-300 text-gray-800 hover:border-cyan-500 hover:text-cyan-600"
+        : "bg-white/5 border border-white/10 text-white hover:border-cyan-400/60 hover:text-cyan-300"
+        }`}
     >
       {children}
     </motion.a>
@@ -499,15 +564,17 @@ function InputField(props: {
   name: string
   type: string
   placeholder: string
+  isLight?: boolean
 }) {
-  const { label, name, type, placeholder } = props
+  const { label, name, type, placeholder, isLight = false } = props
+  const localIsLight = isLight
   const id = `field-${name}`
 
   return (
     <div className="space-y-1">
       <label
         htmlFor={id}
-        className="text-xs font-medium uppercase tracking-[0.2em] text-neutral-300"
+        className={`text-xs font-medium uppercase tracking-[0.2em] ${localIsLight ? "text-gray-600" : "text-neutral-300"}`}
       >
         {label}
       </label>
@@ -517,7 +584,10 @@ function InputField(props: {
         type={type}
         required
         placeholder={placeholder}
-        className="w-full rounded-xl border border-white/20 bg-white/20 px-3 py-3 text-sm text-white placeholder-neutral-300 outline-none transition focus:border-cyan-400 focus:ring-2 focus:ring-cyan-500/20"
+        className={`w-full rounded-xl px-3 py-3 text-sm outline-none transition ${localIsLight
+          ? "border border-gray-300 bg-white text-gray-900 placeholder-gray-400 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/20"
+          : "border border-white/20 bg-white/20 text-white placeholder-neutral-300 focus:border-cyan-400 focus:ring-2 focus:ring-cyan-500/20"
+          }`}
       />
     </div>
   )
@@ -527,15 +597,17 @@ function TextareaField(props: {
   label: string
   name: string
   placeholder: string
+  isLight?: boolean
 }) {
-  const { label, name, placeholder } = props
+  const { label, name, placeholder, isLight = false } = props
+  const localIsLight = isLight
   const id = `field-${name}`
 
   return (
     <div className="space-y-1">
       <label
         htmlFor={id}
-        className="text-xs font-medium uppercase tracking-[0.2em] text-neutral-300"
+        className={`text-xs font-medium uppercase tracking-[0.2em] ${localIsLight ? "text-gray-600" : "text-neutral-300"}`}
       >
         {label}
       </label>
@@ -545,7 +617,7 @@ function TextareaField(props: {
         required
         placeholder={placeholder}
         rows={5}
-        className="w-full resize-none rounded-xl border border-white/20 bg-white/20 px-3 py-3 text-sm text-white placeholder-neutral-300 outline-none transition focus:border-cyan-400 focus:ring-2 focus:ring-cyan-500/20"
+        className={`w-full resize-none rounded-xl border px-3 py-3 text-sm outline-none transition focus:border-cyan-400 focus:ring-2 focus:ring-cyan-500/20 ${localIsLight ? "border-gray-200 bg-white text-gray-900 placeholder-gray-500" : "border-white/20 bg-white/20 text-white placeholder-neutral-300"}`}
       />
     </div>
   )

@@ -27,10 +27,10 @@ import {
 import { FaGitAlt } from "react-icons/fa";
 
 // Tech list with React icon components
-type Item = { 
-  key: string; 
-  label: string; 
-  color: string; 
+type Item = {
+  key: string;
+  label: string;
+  color: string;
   icon: React.ComponentType<{ size?: number; color?: string; className?: string }>;
 };
 
@@ -74,7 +74,7 @@ function useOnceInView(id: string, threshold = 0.15) {
       return;
     }
     const io = new IntersectionObserver(
-      (entries) => entries.forEach((e) => e.isIntersecting && setActive(true)), 
+      (entries) => entries.forEach((e) => e.isIntersecting && setActive(true)),
       { threshold }
     );
     io.observe(el);
@@ -87,7 +87,7 @@ function useOnceInView(id: string, threshold = 0.15) {
 const SkillTile = memo(({ item, boxSize }: { item: Item; boxSize: number }) => {
   const IconComponent = item.icon;
   const iconSize = boxSize > 100 ? 40 : boxSize > 85 ? 34 : 28;
-  
+
   return (
     <div
       data-key={item.key}
@@ -99,11 +99,12 @@ const SkillTile = memo(({ item, boxSize }: { item: Item; boxSize: number }) => {
     >
       <div className="ps2d-row">
         <div className="ps2d-logo-wrap">
-          <IconComponent 
+          <IconComponent
             size={iconSize}
-            color="#1a1a1a"
+            color="#111827"
             className="ps2d-logo"
           />
+
         </div>
         <span className="ps2d-text">{item.label}</span>
       </div>
@@ -139,10 +140,10 @@ export default function Skills() {
     const width = typeof window !== 'undefined' ? window.innerWidth : 1200;
     const isMobile = width < 640;
     const boxSize = isMobile ? (width < 480 ? 75 : 85) : (width < 768 ? 105 : 140);
-    
+
     const cols = width < 480 ? 3 : width < 640 ? 3 : width < 768 ? 4 : 5;
     const spacing = boxSize + (isMobile ? 15 : 25);
-    
+
     return SKILLS.map((_, i) => {
       const row = Math.floor(i / cols);
       const col = i % cols;
@@ -190,20 +191,20 @@ export default function Skills() {
     const height = scene.clientHeight;
 
     // ✨ OPTIMIZED ENGINE with smooth physics
-    const engine = Engine.create({ 
+    const engine = Engine.create({
       gravity: { x: 0, y: 0.98, scale: 0.001 },
       enableSleeping: true,
       timing: {
         timeScale: 1
       }
     });
-    
+
     // ✨ BALANCED iterations for smooth + performant physics
     engine.positionIterations = 8;
     engine.velocityIterations = 6;
     engineRef.current = engine;
 
-    const runner = Runner.create({ 
+    const runner = Runner.create({
       delta: 1000 / 60,
       enabled: true
     });
@@ -211,7 +212,7 @@ export default function Skills() {
     Runner.run(runner, engine);
 
     const wall = 120;
-    
+
     // ✨ IMPROVED WALL PHYSICS - Better bounce and friction
     const ceiling = Bodies.rectangle(width / 2, -wall / 2, width + 200, wall, {
       isStatic: true,
@@ -220,7 +221,7 @@ export default function Skills() {
       frictionStatic: 0.05,
       label: 'ceiling'
     });
-    
+
     const floor = Bodies.rectangle(width / 2, height + wall / 2, width + 200, wall, {
       isStatic: true,
       restitution: 0.65,
@@ -228,21 +229,21 @@ export default function Skills() {
       frictionStatic: 0.08,
       label: 'floor'
     });
-    
-    const left = Bodies.rectangle(-wall / 2, height / 2, wall, height * 3, { 
-      isStatic: true, 
+
+    const left = Bodies.rectangle(-wall / 2, height / 2, wall, height * 3, {
+      isStatic: true,
       restitution: 0.55,
       friction: 0.05,
       label: 'left'
     });
-    
-    const right = Bodies.rectangle(width + wall / 2, height / 2, wall, height * 3, { 
-      isStatic: true, 
+
+    const right = Bodies.rectangle(width + wall / 2, height / 2, wall, height * 3, {
+      isStatic: true,
       restitution: 0.55,
       friction: 0.05,
       label: 'right'
     });
-    
+
     World.add(engine.world, [ceiling, floor, left, right]);
 
     // ✨ IMPROVED BODY PHYSICS - Smooth, realistic movement
@@ -266,7 +267,7 @@ export default function Skills() {
         },
         chamfer: { radius: s * 0.08 }
       });
-      
+
       Body.setAngle(body, (Math.random() - 0.5) * 0.08);
       bodiesRef.current.set(item.key, body);
       World.add(engine.world, body);
@@ -278,9 +279,9 @@ export default function Skills() {
       for (const pair of pairs) {
         const bodyA = pair.bodyA;
         const bodyB = pair.bodyB;
-        
+
         if (bodyA.isStatic || bodyB.isStatic) continue;
-        
+
         // Wake up bodies on collision
         bodyA.isSleeping = false;
         bodyB.isSleeping = false;
@@ -291,20 +292,20 @@ export default function Skills() {
     Events.on(engine, "beforeUpdate", () => {
       bodiesRef.current.forEach((body) => {
         if (body.isSleeping) return;
-        
+
         // Gradual rotation damping
         const angularDamping = 0.92;
         Body.setAngularVelocity(body, body.angularVelocity * angularDamping);
-        
+
         // Limit maximum angular velocity
         const maxAngularVelocity = 0.25;
         if (Math.abs(body.angularVelocity) > maxAngularVelocity) {
           Body.setAngularVelocity(
-            body, 
+            body,
             Math.sign(body.angularVelocity) * maxAngularVelocity
           );
         }
-        
+
         // Limit maximum velocity for stability
         const maxVelocity = 15;
         const speed = Math.sqrt(body.velocity.x ** 2 + body.velocity.y ** 2);
@@ -323,11 +324,11 @@ export default function Skills() {
       bodiesRef.current.forEach((body) => {
         const { x, y } = body.position;
         const margin = BOX.size / 2 + 15;
-        
+
         let needsCorrection = false;
         let newX = x;
         let newY = y;
-        
+
         if (x < margin) {
           newX = margin;
           needsCorrection = true;
@@ -335,7 +336,7 @@ export default function Skills() {
           newX = width - margin;
           needsCorrection = true;
         }
-        
+
         if (y < margin) {
           newY = margin;
           needsCorrection = true;
@@ -343,12 +344,12 @@ export default function Skills() {
           newY = height - margin;
           needsCorrection = true;
         }
-        
+
         if (needsCorrection) {
           Body.setPosition(body, { x: newX, y: newY });
-          Body.setVelocity(body, { 
-            x: body.velocity.x * 0.3, 
-            y: body.velocity.y * 0.3 
+          Body.setVelocity(body, {
+            x: body.velocity.x * 0.3,
+            y: body.velocity.y * 0.3
           });
         }
       });
@@ -356,30 +357,30 @@ export default function Skills() {
 
     const tiles = Array.from(scene.querySelectorAll<HTMLDivElement>(".ps2d-tile"));
     let animationFrameId: number;
-    
+
     // ✨ OPTIMIZED DOM SYNC with transform caching
     const POSITION_THRESHOLD = 0.3;
     const ANGLE_THRESHOLD = 0.008;
-    
+
     const syncDOM = () => {
       for (const el of tiles) {
         const key = el.dataset.key!;
         const body = bodiesRef.current.get(key);
         if (!body) continue;
-        
+
         const { x, y } = body.position;
         const angle = body.angle;
         const last = lastUpdateRef.current.get(key);
-        
-        if (!last || 
-            Math.abs(x - last.x) > POSITION_THRESHOLD ||
-            Math.abs(y - last.y) > POSITION_THRESHOLD ||
-            Math.abs(angle - last.angle) > ANGLE_THRESHOLD) {
-          
+
+        if (!last ||
+          Math.abs(x - last.x) > POSITION_THRESHOLD ||
+          Math.abs(y - last.y) > POSITION_THRESHOLD ||
+          Math.abs(angle - last.angle) > ANGLE_THRESHOLD) {
+
           const translateX = Math.round((x - el.offsetWidth / 2) * 100) / 100;
           const translateY = Math.round((y - el.offsetHeight / 2) * 100) / 100;
           const rotation = Math.round(angle * 1000) / 1000;
-          
+
           el.style.transform = `translate3d(${translateX}px, ${translateY}px, 0) rotate(${rotation}rad)`;
           lastUpdateRef.current.set(key, { x, y, angle });
         }
@@ -402,20 +403,20 @@ export default function Skills() {
           const key = (event.target as HTMLElement).dataset.key!;
           const body = bodiesRef.current.get(key);
           if (!body) return;
-          
+
           Body.setStatic(body, false);
           body.isSleeping = false;
           Body.setAngularVelocity(body, 0);
           Body.setVelocity(body, { x: 0, y: 0 });
-          
+
           const rect = scene.getBoundingClientRect();
           const clientX = event.clientX || event.touches?.[0]?.clientX || 0;
           const clientY = event.clientY || event.touches?.[0]?.clientY || 0;
-          const mouse = { 
-            x: clientX - rect.left, 
-            y: clientY - rect.top 
+          const mouse = {
+            x: clientX - rect.left,
+            y: clientY - rect.top
           };
-          
+
           const spring = Constraint.create({
             pointA: mouse,
             bodyB: body,
@@ -430,14 +431,14 @@ export default function Skills() {
           const key = (event.target as HTMLElement).dataset.key!;
           const spring = constraintsRef.current.get(key);
           if (!spring) return;
-          
+
           const rect = scene.getBoundingClientRect();
           const clientX = event.clientX || event.touches?.[0]?.clientX || 0;
           const clientY = event.clientY || event.touches?.[0]?.clientY || 0;
-          
-          spring.pointA = { 
-            x: clientX - rect.left, 
-            y: clientY - rect.top 
+
+          spring.pointA = {
+            x: clientX - rect.left,
+            y: clientY - rect.top
           };
         },
         end(event) {
@@ -445,7 +446,7 @@ export default function Skills() {
           const spring = constraintsRef.current.get(key);
           if (!spring) return;
           const body = bodiesRef.current.get(key);
-          
+
           if (body) {
             // ✨ Better velocity inheritance from drag
             const velocityMultiplier = 0.75;
@@ -453,22 +454,22 @@ export default function Skills() {
               x: body.velocity.x * velocityMultiplier,
               y: body.velocity.y * velocityMultiplier
             });
-            
+
             // Add slight rotation on release
             const horizontalVelocity = Math.abs(body.velocity.x);
             if (horizontalVelocity > 2) {
               Body.setAngularVelocity(
-                body, 
+                body,
                 (Math.random() - 0.5) * 0.15
               );
             }
-            
+
             // Gentle upward boost if near bottom
             if (body.position.y > scene.clientHeight - 140) {
               Body.applyForce(body, body.position, { x: 0, y: -0.008 });
             }
           }
-          
+
           World.remove(engine.world, spring);
           constraintsRef.current.delete(key);
         },
@@ -482,16 +483,16 @@ export default function Skills() {
       resizeTimeout = setTimeout(() => {
         const w = scene.clientWidth;
         const h = scene.clientHeight;
-        
+
         Body.setPosition(ceiling, { x: w / 2, y: -wall / 2 });
         Body.setVertices(ceiling, Bodies.rectangle(w / 2, -wall / 2, w + 200, wall, { isStatic: true }).vertices);
-        
+
         Body.setPosition(floor, { x: w / 2, y: h + wall / 2 });
         Body.setVertices(floor, Bodies.rectangle(w / 2, h + wall / 2, w + 200, wall, { isStatic: true }).vertices);
-        
+
         Body.setPosition(right, { x: w + wall / 2, y: h / 2 });
         Body.setVertices(right, Bodies.rectangle(w + wall / 2, h / 2, wall, h * 3, { isStatic: true }).vertices);
-        
+
         Body.setPosition(left, { x: -wall / 2, y: h / 2 });
         Body.setVertices(left, Bodies.rectangle(-wall / 2, h / 2, wall, h * 3, { isStatic: true }).vertices);
       }, 150);
@@ -537,7 +538,6 @@ export default function Skills() {
             <SkillTile key={item.key} item={item} boxSize={BOX.size} />
           ))}
         </div>
-        <div className="ps2d-floor-line" />
       </div>
     </section>
   );
@@ -565,17 +565,21 @@ function StyleTag({ boxSize }: { boxSize: number }) {
   width: 100%;
   min-height: 100vh;
   height: 100dvh;
-  background: #070a0f;
-  color: #fff;
+  background: var(--skills-bg);
+  color: var(--skills-text);
   overflow: hidden;
   scroll-snap-align: start;
   scroll-snap-stop: always;
 }
 
-html, body {
-  scroll-behavior: smooth;
+html.dark .ps2d-root{
+  border-bottom:1px solid rgba(34,211,238,.35);
 }
 
+html.light .ps2d-root{
+  border-bottom:1px solid rgba(15,23,42,.15);
+}
+  
 .ps2d-header {
   pointer-events: none;
   position: absolute;
@@ -585,16 +589,35 @@ html, body {
   z-index: 10;
   padding: 0 16px;
 }
-.ps2d-title {
-  font-size: clamp(22px, 4.0vw, 56px);
-  font-weight: 900;
-  letter-spacing: -0.02em;
+.ps2d-title{
+  font-size: clamp(22px,4vw,56px);
+  font-weight:900;
+  letter-spacing:-0.02em;
 }
-.ps2d-accent { color: #22d3ee; }
-.ps2d-sub { 
-  margin-top: 6px; 
-  opacity: 0.8; 
-  font-size: clamp(12px, 2vw, 16px);
+
+html.light .ps2d-title{
+  color:#111827;
+}
+
+html.dark .ps2d-title{
+  color:#ffffff;
+}
+
+.ps2d-accent{
+  color:rgb(var(--accent-1));
+}
+
+html.light .ps2d-sub{
+  color:#374151;
+}
+
+html.dark .ps2d-sub{
+  color:#d1d5db;
+}
+
+.ps2d-sub{
+  margin-top:6px;
+  opacity:.8;
 }
 
 .ps2d-scene {
@@ -652,30 +675,32 @@ html, body {
   margin-top: ${boxSize > 100 ? '8px' : '4px'};
 }
 
-.ps2d-logo {
-  pointer-events: none;
-  user-select: none;
-  -webkit-user-drag: none;
-  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
+.ps2d-logo{
+pointer-events:none;
+user-select:none;
+-webkit-user-drag:none;
+filter:none;
 }
 
-.ps2d-text {
-  font-weight: 900;
-  letter-spacing: 0.3px;
-  color: #ffffff;
-  font-size: ${boxSize > 100 ? '13px' : boxSize > 85 ? '11px' : '9px'};
-  text-align: center;
-  pointer-events: none;
-  text-shadow: 0 1px 3px rgba(0,0,0,0.3);
-  margin-bottom: ${boxSize > 100 ? '4px' : '2px'};
+.ps2d-text{
+  font-weight:900;
+  letter-spacing:.3px;
+  font-size:${boxSize > 100 ? '13px' : boxSize > 85 ? '11px' : '9px'};
+  text-align:center;
+  pointer-events:none;
+  text-shadow:0 1px 3px rgba(0,0,0,.25);
 }
 
-.ps2d-floor-line {
-  pointer-events: none;
-  position: absolute;
-  left: 0; right: 0; bottom: 0;
-  height: 4px;
-  background: rgba(255,255,255,0.08);
+html.light .ps2d-text{
+  color:#111827;
+}
+
+html.dark .ps2d-text{
+  color:#ffffff;
+}
+
+.ps2d-tile:hover{
+box-shadow:0 8px 20px rgba(0,0,0,.18);
 }
 
 @media (max-width: 640px) {

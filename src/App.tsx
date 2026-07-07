@@ -18,7 +18,7 @@ export default function App() {
   const [introDone, setIntroDone] = useState(false);
 
   return (
-    <main className="min-h-screen bg-black text-white selection:bg-cyan-300/20 selection:text-white">
+    <main className="min-h-screen bg-[rgb(var(--bg))] text-[var(--text-color)] selection:bg-cyan-300/20">
       {/* Intro Animation */}
       {!introDone ? (
         <IntroFullscreen

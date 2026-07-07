@@ -1,14 +1,14 @@
-import React, { useEffect, useMemo, useRef } from 'react'
+import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { useReducedMotion } from 'framer-motion'
 
 
 type Options = {
-  followEase?: number            
-  dotSize?: number               
-  dotSizeHover?: number        
-  glowSize?: number            
-  glowSizeHover?: number        
-  enableSparks?: boolean         
+  followEase?: number
+  dotSize?: number
+  dotSizeHover?: number
+  glowSize?: number
+  glowSizeHover?: number
+  enableSparks?: boolean
   sparkCount?: number
 }
 
@@ -27,8 +27,9 @@ export default function CursorGlow({
   const rafRef = useRef<number | null>(null)
   const sparksRef = useRef<HTMLDivElement[]>([])
   const enabledRef = useRef(true)
+  const [isLight, setIsLight] = useState(false)
 
- 
+
   useEffect(() => {
     const onTouch = () => { enabledRef.current = false; hide() }
     const onMouse = () => { enabledRef.current = true; show() }
@@ -44,10 +45,26 @@ export default function CursorGlow({
   useEffect(() => {
     if (prefersReduced) hide()
     else show()
-   
+
   }, [prefersReduced])
 
- 
+  useEffect(() => {
+    const updateTheme = () => {
+      setIsLight(document.documentElement.classList.contains("light"))
+    }
+
+    updateTheme()
+
+    const observer = new MutationObserver(updateTheme)
+
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ["class"],
+    })
+
+    return () => observer.disconnect()
+  }, [])
+
   useEffect(() => {
     const dot = dotRef.current
     const glow = glowRef.current
@@ -184,7 +201,9 @@ export default function CursorGlow({
             borderRadius: 9999,
             background:
               'linear-gradient(180deg, rgba(var(--accent-1),1), rgba(var(--accent-2),1))',
-            boxShadow: '0 0 20px rgba(76,230,255,0.3), 0 0 24px rgba(95,84,255,0.25)',
+            boxShadow: isLight
+              ? '0 0 16px rgba(59,130,246,.20),0 0 20px rgba(168,85,247,.15)'
+              : '0 0 20px rgba(76,230,255,.30),0 0 24px rgba(95,84,255,.25)',
             opacity: 0
           }}
         />
@@ -203,8 +222,9 @@ export default function CursorGlow({
         style={{
           width: glowSize,
           height: glowSize,
-          background:
-            'radial-gradient(circle at 30% 30%, rgba(var(--accent-1),0.18), rgba(var(--accent-2),0.12) 40%, transparent 60%)',
+          background: isLight
+            ? 'radial-gradient(circle at 30% 30%, rgba(59,130,246,0.15), rgba(168,85,247,0.10) 40%, transparent 60%)'
+            : 'radial-gradient(circle at 30% 30%, rgba(var(--accent-1),0.18), rgba(var(--accent-2),0.12) 40%, transparent 60%)',
           opacity: 0.9,
           pointerEvents: 'none'
         }}
@@ -216,7 +236,9 @@ export default function CursorGlow({
           width: dotSize,
           height: dotSize,
           background: 'linear-gradient(180deg, rgba(var(--accent-1),1), rgba(var(--accent-2),1))',
-          boxShadow: '0 0 18px rgba(76,230,255,0.35), 0 0 22px rgba(95,84,255,0.25)'
+          boxShadow: isLight
+            ? '0 0 16px rgba(59,130,246,.25),0 0 20px rgba(168,85,247,.18)'
+            : '0 0 18px rgba(76,230,255,.35),0 0 22px rgba(95,84,255,.25)',
         }}
       />
     </>

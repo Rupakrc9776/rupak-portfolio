@@ -57,8 +57,9 @@ const barGrow = (w: string, d = 0): Variants => ({
 
 /* Reusable classes */
 const cardBase =
-  "rounded-2xl border border-white/30 bg-white/10 backdrop-blur-xl max-w-full overflow-hidden shadow-[0_10px_30px_rgba(255,255,255,0.06)]";
-const tinyMuted = "text-xs text-neutral-100/80";
+  "rounded-2xl border border-gray-300 dark:border-white/20 bg-white/80 dark:bg-white/10 backdrop-blur-xl max-w-full overflow-hidden shadow-[0_10px_30px_rgba(0,0,0,0.08)] dark:shadow-[0_10px_30px_rgba(255,255,255,0.06)]";
+const tinyMuted =
+  "text-xs text-gray-600 dark:text-neutral-300";
 const sectionP = "px-3 sm:px-4 md:px-6 py-8 sm:py-10 md:py-12";
 
 /* -------------------------
@@ -70,7 +71,7 @@ export default function AboutHeroFull() {
 
   return (
     <section
-      className="relative w-full max-w-full overflow-x-hidden text-white"
+      className="relative w-full max-w-full overflow-x-hidden text-gray-900 dark:text-white"
       style={{ minHeight: "100svh" }}
       aria-labelledby="about-title"
     >
@@ -338,7 +339,7 @@ const AnimatedProfile = memo(function AnimatedProfile({ accents }: { accents: st
               }}
             >
               <motion.div
-                className="w-12 h-12 rounded-full flex items-center justify-center backdrop-blur-sm border border-white/20 shadow-lg"
+                className="w-12 h-12 rounded-full flex items-center justify-center backdrop-blur-sm border border-gray-300 dark:border-white/20 shadow-lg"
                 style={{
                   background: `${color}22`,
                   transformStyle: "preserve-3d",
@@ -363,7 +364,7 @@ const AnimatedProfile = memo(function AnimatedProfile({ accents }: { accents: st
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.8, duration: 0.5 }}
       >
-        <p className="text-sm sm:text-base md:text-lg text-neutral-100/90 max-w-2xl mx-auto">
+        <p className="text-sm sm:text-base md:text-lg text-gray-700 dark:text-neutral-100/90 max-w-2xl mx-auto">
 
         </p>
       </motion.div>
@@ -375,19 +376,43 @@ const AnimatedProfile = memo(function AnimatedProfile({ accents }: { accents: st
    Background beams
    ------------------------- */
 const BackgroundBeams = memo(function BackgroundBeams({ accents }: { accents: string[] }) {
+  const [isLight, setIsLight] = useState(false);
+
+  useEffect(() => {
+    const updateTheme = () => {
+      setIsLight(document.documentElement.classList.contains("light"));
+    };
+
+    updateTheme();
+
+    const observer = new MutationObserver(updateTheme);
+
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ["class"],
+    });
+
+    return () => observer.disconnect();
+  }, []);
+
   return (
     <div className="absolute inset-0 -z-10 overflow-x-hidden">
       <div
         className="absolute inset-0 max-w-full"
         style={{
-          background: `radial-gradient(60vw 60vw at 50% 35%, ${hexA(accents[0], 0.12)}, transparent 60%),
-                       radial-gradient(40vw 40vw at 85% 80%, ${hexA(accents[1], 0.1)}, transparent 65%),
-                       linear-gradient(180deg, #0d0e1a, #161728)`,
+          background: isLight
+            ? `radial-gradient(60vw 60vw at 50% 35%, ${hexA(accents[0], 0.08)}, transparent 60%),
+     radial-gradient(40vw 40vw at 85% 80%, ${hexA(accents[1], 0.06)}, transparent 65%),
+     linear-gradient(180deg,#ffffff,#f3f4f6)`
+            : `radial-gradient(60vw 60vw at 50% 35%, ${hexA(accents[0], 0.12)}, transparent 60%),
+     radial-gradient(40vw 40vw at 85% 80%, ${hexA(accents[1], 0.10)}, transparent 65%),
+     linear-gradient(180deg,#0d0e1a,#161728)`,
         }}
       />
       <div
-        className="absolute inset-0 opacity-[0.08] max-w-full"
+        className="absolute inset-0 max-w-full"
         style={{
+          opacity: isLight ? 0.03 : 0.08,
           backgroundImage:
             "linear-gradient(to right, rgba(255,255,255,0.15) 1px, transparent 1px), linear-gradient(to bottom, rgba(255,255,255,0.15) 1px, transparent 1px)",
           backgroundSize: "40px 40px",
@@ -396,14 +421,14 @@ const BackgroundBeams = memo(function BackgroundBeams({ accents }: { accents: st
         }}
       />
       <motion.div
-        className="absolute -left-[20%] top-[10%] h-[160vh] w-[60vw] bg-gradient-to-b from-white/5 to-transparent blur-3xl"
+        className="absolute -left-[20%] top-[10%] h-[160vh] w-[60vw] bg-gradient-to-b from-black/5 dark:from-white/5 to-transparent blur-3xl"
         initial={{ rotate: -18, opacity: 0 }}
         whileInView={{ rotate: -14, opacity: 0.12 }}
         viewport={{ once: true }}
         transition={{ duration: 1.2, ease: "easeOut" }}
       />
       <motion.div
-        className="absolute -right-[20%] bottom-[-10%] h-[160vh] w-[60vw] bg-gradient-to-t from-white/4 to-transparent blur-[64px]"
+        className="absolute -right-[20%] bottom-[-10%] h-[160vh] w-[60vw] bg-gradient-to-t from-black/5 dark:from-white/4 to-transparent blur-[64px]"
         initial={{ rotate: 14, opacity: 0 }}
         whileInView={{ rotate: 10, opacity: 0.1 }}
         viewport={{ once: true }}
@@ -426,7 +451,7 @@ function Tabs({
   accents: string[];
 }) {
   return (
-    <div className="flex border-b border-white/20">
+    <div className="flex border-b border-gray-300 dark:border-white/20">
       <TabButton
         active={active === "education"}
         onClick={() => onChange("education")}
@@ -471,7 +496,7 @@ const TabButton = memo(function TabButton({
           transition={{ type: "spring", bounce: 0.2, duration: 0.45 }}
         />
       )}
-      <span className={`flex items-center justify-center gap-2 ${active ? "text-white" : "text-neutral-300"}`}>
+      <span className={`flex items-center justify-center gap-2 ${active ? "text-gray-900 dark:text-white" : "text-gray-700 dark:text-neutral-300"}`}>
         <span className="text-xl">{icon}</span>
         {label}
       </span>
@@ -497,7 +522,7 @@ function EducationTimeline({ accents }: { accents: string[] }) {
       period: "2024–2028",
       degree: "B.Tech, Electrical Engineering",
       institution: "Dr. B.C. Roy Engineering College",
-      cgpa: "Current CGPA: 7.2 (4th sem)",
+      cgpa: "Current CGPA: 7.2 (4th semester)",
       color: accents[0],
       icon: "🎓",
     },
@@ -521,12 +546,13 @@ function EducationTimeline({ accents }: { accents: string[] }) {
 
   return (
     <motion.div variants={listContainer} initial="hidden" animate="show" className="relative max-w-full">
-      <div className="pointer-events-none absolute left-1/2 top-0 -translate-x-1/2 h-full w-px hidden md:block">
+      <div className="pointer-events-none absolute left-1/2 top-0 -translate-x-1/2 h-full w-[2px] hidden md:block z-0">
         <div
-          className="h-full w-px"
+          className="h-full w-[2px]"
           style={{
-            background:
-              "linear-gradient(180deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.35) 12%, rgba(255,255,255,0.35) 88%, rgba(255,255,255,0) 100%)",
+            background: document.documentElement.classList.contains("light")
+              ? "linear-gradient(180deg,#22d3ee 0%,#06b6d4 50%,#a855f7 100%)"
+              : "linear-gradient(180deg,#a855f7 0%,#06b6d4 50%,#22d3ee 100%)"
           }}
         />
       </div>
@@ -544,10 +570,10 @@ function EducationTimeline({ accents }: { accents: string[] }) {
                 <motion.div
                   whileHover={{ y: -1 }}
                   transition={{ type: "spring", stiffness: 260, damping: 20 }}
-                  className="relative rounded-xl border border-white/25 bg-white/10 backdrop-blur-xl px-4 sm:px-5 py-4 sm:py-5 shadow-[0_10px_30px_rgba(255,255,255,0.06)] max-w-full overflow-hidden"
+                  className="relative z-20 rounded-xl border border-gray-300 dark:border-white/25 bg-white/80 dark:bg-white/10 backdrop-blur-xl px-4 sm:px-5 py-4 sm:py-5 shadow-[0_10px_30px_rgba(0,0,0,0.08)] dark:shadow-[0_10px_30px_rgba(255,255,255,0.06)] max-w-full overflow-hidden"
                 >
                   <span
-                    className="absolute top-1/2 -translate-y-1/2 hidden md:block w-2.5 h-2.5 rounded-full border border-white/40"
+                    className="absolute top-1/2 -translate-y-1/2 hidden md:block w-2.5 h-2.5 rounded-full border border-cyan-300 dark:border-white/40"
                     style={{
                       backgroundColor: e.color,
                       left: leftSide ? ("calc(100% + 10px)" as string) : undefined,
@@ -558,9 +584,11 @@ function EducationTimeline({ accents }: { accents: string[] }) {
                     className="absolute top-1/2 -translate-y-1/2 hidden md:block h-[2px]"
                     style={{
                       width: "36px",
-                      background: `linear-gradient(90deg, ${leftSide ? `${e.color}99, transparent` : `transparent, ${e.color}99`})`,
-                      left: leftSide ? "100%" : undefined,
-                      right: !leftSide ? "100%" : undefined,
+                      background: leftSide
+                        ? `linear-gradient(90deg, ${e.color}, transparent)`
+                        : `linear-gradient(90deg, transparent, ${e.color})`,
+                      left: leftSide ? "calc(100% - 1px)" : undefined,
+                      right: !leftSide ? "calc(100% - 1px)" : undefined,
                     }}
                   />
                   <div className="flex items-start gap-3 sm:gap-3.5">
@@ -579,12 +607,12 @@ function EducationTimeline({ accents }: { accents: string[] }) {
                         >
                           {e.period}
                         </span>
-                        <span className="text-xs text-neutral-200/80">•</span>
-                        <span className="text-xs text-neutral-200/80">Secured {e.cgpa}</span>
+                        <span className="text-xs text-gray-600 dark:text-neutral-300">•</span>
+                        <span className="text-xs text-gray-600 dark:text-neutral-300">Secured {e.cgpa}</span>
                       </div>
-                      <h4 className="mt-1 text-base sm:text-lg font-bold text-white">{e.degree}</h4>
+                      <h4 className="mt-1 text-base sm:text-lg font-bold text-gray-900 dark:text-white">{e.degree}</h4>
                       <p className={tinyMuted.replace("100/80", "100/85")}>{e.institution}</p>
-                      <div className="mt-3 h-1 w-full overflow-hidden rounded-full bg-white/15">
+                      <div className="mt-3 h-1 w-full overflow-hidden rounded-full bg-gray-200 dark:bg-white/15">
                         <motion.div
                           variants={barGrow("100%")}
                           initial="hidden"
@@ -666,11 +694,11 @@ const AchievementsGrid = memo(function AchievementsGrid() {
 
         return (
           <motion.div
-            key={item.title}
+            key={`${item.title}-${idx}`}
             initial={{ scale: 1, opacity: 1 }}
             whileHover={!isTouch ? { scale: 1.02 } : {}}
             transition={{ duration: 0.25 }}
-            className="group relative rounded-xl border border-white/20 bg-white/10 backdrop-blur-xl overflow-hidden cursor-pointer shadow-[0_10px_30px_rgba(255,255,255,0.06)]"
+            className="group relative rounded-xl border border-gray-300 dark:border-white/20 bg-white/80 dark:bg-white/10 backdrop-blur-xl overflow-hidden cursor-pointer shadow-[0_10px_30px_rgba(0,0,0,0.08)] dark:shadow-[0_10px_30px_rgba(255,255,255,0.06)]"
             style={{ minHeight: 140 }}
             onClick={() =>
               setSelectedCertificate({
@@ -682,10 +710,10 @@ const AchievementsGrid = memo(function AchievementsGrid() {
             {/* Text content – always visible */}
             <div className="relative z-10 p-3.5">
               <div className="flex items-center justify-between mb-1.5">
-                <h4 className="text-sm font-semibold text-white">{item.title}</h4>
-                <div className="text-xs text-neutral-200">🏅</div>
+                <h4 className="text-sm font-semibold text-gray-900 dark:text-white">{item.title}</h4>
+                <div className="text-xs text-gray-600 dark:text-neutral-200">🏅</div>
               </div>
-              <p className="text-xs text-neutral-100/90">{item.subtitle}</p>
+              <p className="text-xs text-gray-600 dark:text-neutral-300">{item.subtitle}</p>
             </div>
 
             {/* DESKTOP: image slides up on hover */}
@@ -722,7 +750,7 @@ const AchievementsGrid = memo(function AchievementsGrid() {
                       loading="lazy"
                       className="w-full h-40 object-cover"
                     />
-                    <div className="p-3 text-white bg-black/60 backdrop-blur-sm">
+                    <div className="p-3 text-gray-900 dark:text-white bg-black/60 backdrop-blur-sm">
                       <h4 className="font-bold text-sm">{item.title}</h4>
                       <p className="text-xs text-neutral-100/85 mt-1">
                         {item.subtitle}
@@ -741,7 +769,7 @@ const AchievementsGrid = memo(function AchievementsGrid() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[9999] bg-black/95 flex items-center justify-center p-4 overflow-auto"
+            className="fixed inset-0 z-[9999] bg-white/80 dark:bg-black/90 backdrop-blur-xl flex items-center justify-center p-4 overflow-auto"
             onClick={() => setSelectedCertificate(null)}
           >
             <motion.div
@@ -761,7 +789,7 @@ const AchievementsGrid = memo(function AchievementsGrid() {
               <a
                 href={selectedCertificate.image}
                 download
-                className="fixed top-5 left-5 z-[10001] bg-cyan-500/20 backdrop-blur-xl border border-cyan-400/30 text-cyan-100 px-4 py-2 rounded-xl shadow-lg hover:bg-cyan-500/30 transition-all duration-300"
+                className="fixed top-5 left-5 z-[10001] bg-white/20 dark:bg-cyan-500/20 backdrop-blur-xl border border-cyan-400/30 text-cyan-700 dark:text-cyan-100 px-4 py-2 rounded-xl shadow-lg hover:bg-cyan-500/30 transition-all duration-300"
               >
                 Download
               </a>
@@ -772,7 +800,7 @@ const AchievementsGrid = memo(function AchievementsGrid() {
                 className="max-w-full max-h-[65vh] object-contain rounded-xl mx-auto"
               />
 
-              <div className="mt-3 text-center text-white font-semibold">
+              <div className="mt-3 text-center text-gray-900 dark:text-white font-semibold">
                 {selectedCertificate.title}
               </div>
             </motion.div>
@@ -849,7 +877,7 @@ const RadialStat = memo(function RadialStat({
   return (
     <div className="relative w-20 h-20 sm:w-24 sm:h-24 flex-shrink-0">
       <svg className="w-full h-full -rotate-90" viewBox="0 0 96 96" aria-hidden>
-        <circle cx="48" cy="48" r="40" stroke="rgba(255,255,255,0.15)" strokeWidth="8" fill="none" />
+        <circle cx="48" cy="48" r="40" stroke="rgba(180,180,180,0.35)" strokeWidth="8" fill="none" />
         <motion.circle
           cx="48"
           cy="48"
@@ -871,8 +899,8 @@ const RadialStat = memo(function RadialStat({
         </defs>
       </svg>
       <div className="absolute inset-0 flex flex-col items-center justify-center">
-        <span className="text-lg font-bold">{innerTop}</span>
-        <span className="text-[10px] text-neutral-800/80">{innerBottom}</span>
+        <span className="text-lg font-bold text-gray-900 dark:text-white">{innerTop}</span>
+        <span className="text-[10px] text-gray-700 dark:text-neutral-300">{innerBottom}</span>
       </div>
     </div>
   );
@@ -885,9 +913,9 @@ const StatBox = memo(function StatBox({ label, value }: { label: string; value: 
       whileInView={{ scale: 1, opacity: 1 }}
       viewport={{ once: true }}
       transition={{ duration: 0.35 }}
-      className="text-center p-2 rounded-lg bg-white/10 border border-white/20 max-w-full"
+      className="text-center p-2 rounded-lg bg-white/80 dark:bg-white/10 border border-gray-300 dark:border-white/20 max-w-full"
     >
-      <div className="text-sm sm:text-base font-bold text-white">{value}</div>
+      <div className="text-sm sm:text-base font-bold text-gray-900 dark:text-white">{value}</div>
       <div className={tinyMuted}>{label}</div>
     </motion.div>
   );
@@ -912,15 +940,15 @@ function ProgressBar({
   return (
     <div className="max-w-full">
       <div className="flex items-center justify-between mb-1.5">
-        <span className="text-sm font-medium text-neutral-100/90">{label}</span>
+        <span className="text-sm font-medium text-gray-900 dark:text-white">{label}</span>
         <div className="flex items-center gap-2 text-xs">
-          <span className="text-neutral-100/80">
+          <span className="text-gray-600 dark:text-neutral-300">
             {solved}/{total}
           </span>
-          <span className="text-neutral-100/70">Beats: {beats}%</span>
+          <span className="text-gray-600 dark:text-neutral-300">Beats: {beats}%</span>
         </div>
       </div>
-      <div className="relative h-2 bg-white/20 rounded-full overflow-hidden">
+      <div className="relative h-2 bg-gray-200 dark:bg-white/20 rounded-full overflow-hidden">
         <motion.div
           variants={barGrow(`${percentage}%`, delay)}
           initial="hidden"
@@ -942,6 +970,26 @@ const GitHubStats = memo(function GitHubStats({
 }: {
   accents: string[];
 }) {
+  const [isLight, setIsLight] = useState(false)
+
+  useEffect(() => {
+    const updateTheme = () => {
+      setIsLight(document.documentElement.classList.contains("light"))
+    }
+
+    updateTheme()
+
+    const observer = new MutationObserver(updateTheme)
+
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ["class"],
+    })
+
+    return () => observer.disconnect()
+  }, [])
+
+  const githubTheme = isLight ? "github_light" : "tokyonight"
   return (
     <motion.div
       variants={fadeUp}
@@ -977,19 +1025,21 @@ const GitHubStats = memo(function GitHubStats({
 
       <div className="space-y-5">
         <img
-          src="https://github-readme-stats.vercel.app/api?username=Rupakrc9776&show_icons=true&theme=tokyonight&hide_border=true&count_private=true"
+          loading="lazy"
+          decoding="async"
+          src={`https://github-readme-stats-sigma-five.vercel.app/api?username=Rupakrc9776&show_icons=true&theme=${githubTheme}&hide_border=true`}
           alt="GitHub Stats"
           className="w-full rounded-xl"
         />
 
         <img
-          src="https://streak-stats.demolab.com?user=Rupakrc9776&theme=tokyonight&hide_border=true"
+          src={`https://streak-stats.demolab.com?user=Rupakrc9776&theme=${githubTheme}&hide_border=true`}
           alt="GitHub Streak"
           className="w-full rounded-xl"
         />
 
         <img
-          src="https://github-readme-stats.vercel.app/api/top-langs/?username=Rupakrc9776&layout=compact&theme=tokyonight&hide_border=true"
+          src={`https://github-readme-stats-sigma-five.vercel.app/api/top-langs/?username=Rupakrc9776&layout=compact&theme=${githubTheme}&hide_border=true`}
           alt="Top Languages"
           className="w-full rounded-xl"
         />

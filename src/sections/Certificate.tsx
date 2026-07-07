@@ -88,7 +88,22 @@ const cardSpring = { type: "spring" as const, stiffness: 150, damping: 16 };
 export default function CertificatesPremium() {
   const [cardsPerSlide, setCardsPerSlide] = useState<number>(4);
   const [currentSlide, setCurrentSlide] = useState<number>(0);
+  const isLight = document.documentElement.classList.contains("light");
 
+  const [, forceUpdate] = useState(0);
+
+  useEffect(() => {
+    const observer = new MutationObserver(() => {
+      forceUpdate(v => v + 1);
+    });
+
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ["class"],
+    });
+
+    return () => observer.disconnect();
+  }, []);
   useEffect(() => {
     const setByWidth = () => {
       const w = window.innerWidth;
@@ -116,19 +131,28 @@ export default function CertificatesPremium() {
   const prev = useCallback(() => setCurrentSlide((s) => (s - 1 < 0 ? totalSlides - 1 : s - 1)), [totalSlides]);
 
   return (
-    <section className="relative w-full bg-gradient-to-b from-[#0d0e1a] via-[#161728] to-[#0d0e1a] py-8 sm:py-5 overflow-hidden">
+    <section
+      className={`relative w-full py-8 sm:py-5 overflow-hidden transition-colors duration-500 ${isLight
+        ? "bg-gradient-to-b from-white via-slate-50 to-white"
+        : "bg-gradient-to-b from-[#0d0e1a] via-[#161728] to-[#0d0e1a]"
+        }`}
+    >
       {/* background */}
       <div className="absolute inset-0">
         <div
-          className="absolute inset-0 opacity-[0.03]"
+          className={`absolute inset-0 ${isLight ? "opacity-[0.08]" : "opacity-[0.03]"
+            }`}
           style={{
-            backgroundImage:
-              "linear-gradient(to right, rgba(255,255,255,0.06) 1px, transparent 1px), linear-gradient(to bottom, rgba(255,255,255,0.06) 1px, transparent 1px)",
+            backgroundImage: isLight
+              ? "linear-gradient(to right, rgba(0,0,0,0.08) 1px, transparent 1px), linear-gradient(to bottom, rgba(0,0,0,0.08) 1px, transparent 1px)"
+              : "linear-gradient(to right, rgba(255,255,255,0.06) 1px, transparent 1px), linear-gradient(to bottom, rgba(255,255,255,0.06) 1px, transparent 1px)",
             backgroundSize: "48px 48px",
           }}
         />
-        <div className="absolute left-8 top-16 w-72 sm:w-96 h-72 sm:h-96 bg-cyan-500/6 rounded-full blur-3xl" />
-        <div className="absolute right-8 bottom-16 w-72 sm:w-96 h-72 sm:h-96 bg-purple-500/6 rounded-full blur-3xl" />
+        <div className={`absolute left-8 top-16 w-72 sm:w-96 h-72 sm:h-96 rounded-full blur-3xl ${isLight ? "bg-cyan-400/15" : "bg-cyan-500/6"
+          }`} />
+        <div className={`absolute right-8 bottom-16 w-72 sm:w-96 h-72 sm:h-96 rounded-full blur-3xl ${isLight ? "bg-purple-400/15" : "bg-purple-500/6"
+          }`} />
       </div>
 
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -136,13 +160,17 @@ export default function CertificatesPremium() {
           <span className="inline-block text-xs sm:text-sm md:text-base font-semibold uppercase tracking-wider bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 to-purple-500">
             Credentials & Achievements
           </span>
-          <h2 className="text-3xl sm:text-4xl md:text-6xl font-bold text-white mt-3 sm:mt-4">
+          <h2
+            className={`text-3xl sm:text-4xl md:text-6xl font-bold mt-3 sm:mt-4 ${isLight ? "text-gray-900" : "text-white"}`}
+          >
             Premium{" "}
             <span className="bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 via-purple-500 to-pink-500">
               Certificates
             </span>
           </h2>
-          <p className="text-gray-400 max-w-2xl mx-auto mt-3">
+          <p
+            className={`max-w-2xl mx-auto mt-3 ${isLight ? "text-gray-600" : "text-gray-400"}`}
+          >
             Each certificate presented in an elegant envelope design — hover to reveal the certificate.
           </p>
         </header>
@@ -170,14 +198,20 @@ export default function CertificatesPremium() {
           <button
             aria-label="prev"
             onClick={prev}
-            className="absolute left-0 sm:-left-4 lg:-left-6 top-1/2 -translate-y-1/2 z-30 w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 backdrop-blur-sm flex items-center justify-center text-white hover:scale-110 transition"
+            className={`absolute left-0 sm:-left-4 lg:-left-6 top-1/2 -translate-y-1/2 z-30 w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 rounded-full backdrop-blur-sm flex items-center justify-center transition hover:scale-110 ${isLight
+              ? "bg-white border border-gray-300 text-gray-900 hover:bg-gray-100"
+              : "bg-white/5 border border-white/10 text-white hover:bg-white/10"
+              }`}
           >
             <ArrowLeft className="w-5 h-5 sm:w-6 sm:h-6 md:w-7 md:h-7" />
           </button>
           <button
             aria-label="next"
             onClick={next}
-            className="absolute right-0 sm:-right-4 lg:-right-6 top-1/2 -translate-y-1/2 z-30 w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 backdrop-blur-sm flex items-center justify-center text-white hover:scale-110 transition"
+            className={`absolute right-0 sm:-right-4 lg:-right-6 top-1/2 -translate-y-1/2 z-30 w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 rounded-full backdrop-blur-sm flex items-center justify-center transition hover:scale-110 ${isLight
+              ? "bg-white border border-gray-300 text-gray-900 hover:bg-gray-100"
+              : "bg-white/5 border border-white/10 text-white hover:bg-white/10"
+              }`}
           >
             <ArrowRight className="w-5 h-5 sm:w-6 sm:h-6 md:w-7 md:h-7" />
           </button>
@@ -188,9 +222,12 @@ export default function CertificatesPremium() {
           {Array.from({ length: totalSlides }).map((_, idx) => (
             <button key={idx} onClick={() => setCurrentSlide(idx)} className="group">
               <div
-                className={`h-2 rounded-full transition-all duration-500 ${
-                  idx === currentSlide ? "w-10 sm:w-12 md:w-16 bg-gradient-to-r from-cyan-400 to-purple-500" : "w-2 bg-white/30 group-hover:w-4"
-                }`}
+                className={`h-2 rounded-full transition-all duration-500 ${idx === currentSlide
+                  ? "w-10 sm:w-12 md:w-16 bg-gradient-to-r from-cyan-400 to-purple-500"
+                  : isLight
+                    ? "w-2 bg-gray-400 group-hover:w-4"
+                    : "w-2 bg-white/30 group-hover:w-4"
+                  }`}
               />
             </button>
           ))}
@@ -201,6 +238,8 @@ export default function CertificatesPremium() {
 }
 
 function EnvelopeCard({ certificate, index }: { certificate: Certificate; index: number }) {
+  const isLight =
+    document.documentElement.classList.contains("light");
   const [isHovered, setHovered] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
   const delay = 0.1 * index;
@@ -227,8 +266,12 @@ function EnvelopeCard({ certificate, index }: { certificate: Certificate; index:
             className="absolute bottom-0 left-0 right-0 rounded-lg overflow-hidden"
             style={{
               height: "60%",
-              background: `linear-gradient(135deg, ${certificate.color}40, #1a1a2e90)`,
-              border: "1px solid rgba(255,255,255,0.2)",
+              background: isLight
+                ? `linear-gradient(135deg, ${certificate.color}20, #ffffff)`
+                : `linear-gradient(135deg, ${certificate.color}40, #1a1a2e90)`,
+              border: isLight
+                ? "1px solid rgba(0,0,0,.12)"
+                : "1px solid rgba(255,255,255,.2)",
             }}
             animate={isHovered ? { scale: 1.02, rotateX: 2 } : { scale: 1, rotateX: 0 }}
             transition={{ type: "spring", stiffness: 200, damping: 20 }}
@@ -332,15 +375,18 @@ function EnvelopeCard({ certificate, index }: { certificate: Certificate; index:
             </svg>
 
             <div className="absolute inset-0 flex flex-col justify-between p-4 sm:p-5 lg:p-6 pt-10 sm:pt-12">
-              <h3 className="text-white text-sm sm:text-base lg:text-lg font-bold leading-tight text-center px-2">{certificate.title}</h3>
-              <div className="flex items-center justify-center gap-2 sm:gap-3 text-xs text-white/90 flex-wrap">
+              <h3 className={`text-sm sm:text-base lg:text-lg font-bold leading-tight text-center px-2 ${isLight ? "text-gray-900" : "text-white"}`}>{certificate.title}</h3>
+              <div className={`flex items-center justify-center gap-2 sm:gap-3 text-xs ${isLight ? "text-gray-900" : "text-white"}/90 flex-wrap`}>
                 <div className="flex items-center gap-1.5">
                   <svg className="w-3.5 h-3.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
                     <path d="M10.394 2.08a1 1 0 00-.788 0l-7 3a1 1 0 000 1.84L5.25 8.051a.999.999 0 01.356-.257l4-1.714a1 1 0 11.788 1.838L7.667 9.088l1.94.831a1 1 0 00.787 0l7-3a1 1 0 000-1.838l-7-3zM3.31 9.397L5 10.12v4.102a8.969 8.969 0 00-1.05-.174 1 1 0 01-.89-.89 11.115 11.115 0 01.25-3.762zM9.3 16.573A9.026 9.026 0 007 14.935v-3.957l1.818.78a3 3 0 002.364 0l5.508-2.361a11.026 11.026 0 01.25 3.762 1 1 0 01-.89.89 8.968 8.968 0 00-5.35 2.524 1 1 0 01-1.4 0zM6 18a1 1 0 001-1v-2.065a8.935 8.935 0 00-2-.712V17a1 1 0 001 1z" />
                   </svg>
                   <span className="text-xs">{certificate.issuer}</span>
                 </div>
-                <div className="w-1 h-1 rounded-full bg-white/50" />
+                <div
+                  className={`w-1 h-1 rounded-full ${isLight ? "bg-gray-500" : "bg-white/50"
+                    }`}
+                />
                 <div className="flex items-center gap-1.5">
                   <svg className="w-3.5 h-3.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
                     <path fillRule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clipRule="evenodd" />
@@ -351,10 +397,15 @@ function EnvelopeCard({ certificate, index }: { certificate: Certificate; index:
               <div className="flex justify-center">
                 <button
                   onClick={openDrive}
-                  className="px-4 sm:px-6 lg:px-8 py-2 sm:py-2.5 rounded-lg text-xs sm:text-sm font-semibold text-white shadow-xl transition-all hover:scale-105 hover:shadow-2xl backdrop-blur-sm flex items-center gap-2"
+                  className={`px-4 sm:px-6 lg:px-8 py-2 sm:py-2.5 rounded-lg text-xs sm:text-sm font-semibold ${isLight ? "text-gray-900" : "text-white"} shadow-xl transition-all hover:scale-105 hover:shadow-2xl backdrop-blur-sm flex items-center gap-2`}
                   style={{
-                    background: `linear-gradient(135deg, rgba(255,255,255,0.2), rgba(255,255,255,0.1))`,
-                    border: "1px solid rgba(255,255,255,0.3)",
+                    background: isLight
+                      ? "linear-gradient(135deg,#ffffff,#f1f5f9)"
+                      : "linear-gradient(135deg,rgba(255,255,255,.2),rgba(255,255,255,.1))",
+
+                    border: isLight
+                      ? "1px solid rgba(0,0,0,.12)"
+                      : "1px solid rgba(255,255,255,.3)",
                   }}
                 >
                   <span>View</span>
@@ -381,24 +432,38 @@ function Modal({ onClose, certificate }: { onClose: () => void; certificate: Cer
   }, [onClose]);
 
   const imgSrc = certificate.image ?? cert;
+  const isLight = document.documentElement.classList.contains("light");
 
   return (
     <motion.div className="fixed inset-0 z-50 flex items-center justify-center p-6" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
       <div onClick={onClose} className="absolute inset-0 bg-black/70 backdrop-blur-sm" />
       <motion.div className="relative max-w-4xl w-full rounded-2xl overflow-hidden shadow-2xl" initial={{ scale: 0.9, y: 20 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.9, y: 20 }}>
-        <div className="relative" style={{ background: `linear-gradient(135deg, ${certificate.color}15, #0f1020)` }}>
-          <button onClick={onClose} className="absolute top-4 right-4 z-10 w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white transition-all">
-            ✕
+        <div className="relative" style={{
+          background: isLight
+            ? `linear-gradient(135deg, ${certificate.color}15, #60a5fa)`
+            : `linear-gradient(135deg, ${certificate.color}15, #a78bfa)`
+        }}>
+          <button
+            onClick={onClose}
+            className={`absolute top-4 right-4 z-10 w-10 h-10 rounded-full flex items-center justify-center transition-all ${isLight
+                ? "bg-white border border-gray-300 text-gray-900 hover:bg-gray-100"
+                : "bg-white/10 hover:bg-white/20 text-white"
+              }`}
+          >
+            &times;
           </button>
           <div className="relative">
-            <img src={imgSrc} alt={certificate.title} className="w-full h-[70vh] object-contain bg-gradient-to-b from-black/50 to-black/80" />
+            <img src={imgSrc} alt={certificate.title} className={`w-full h-[70vh] object-contain ${isLight
+              ? "bg-gradient-to-b from-white to-slate-100"
+              : "bg-gradient-to-b from-black/50 to-black/80"
+              }`} />
           </div>
           <div className="p-8 text-center">
             <a
               href={certificate.link}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-block px-6 py-3 rounded-lg text-sm font-semibold text-white shadow-lg transition-all hover:scale-105"
+              className={`inline-block px-6 py-3 rounded-lg text-sm font-semibold ${isLight ? "text-gray-900" : "text-white"} shadow-lg transition-all hover:scale-105`}
               style={{ background: `linear-gradient(135deg, ${certificate.color}, #a78bfa)` }}
             >
               Open in Google Drive

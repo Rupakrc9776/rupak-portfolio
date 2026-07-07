@@ -37,7 +37,7 @@ function useActiveSection(ids: string[]) {
 function Magnetic({ children }: { children: React.ReactNode }) {
   const ref = useRef<HTMLDivElement | null>(null)
   const [style, setStyle] = useState<React.CSSProperties>({})
-  
+
   const onMove = (e: React.MouseEvent<HTMLDivElement>) => {
     const el = ref.current
     if (!el) return
@@ -49,14 +49,14 @@ function Magnetic({ children }: { children: React.ReactNode }) {
       transition: 'transform 100ms cubic-bezier(.2,.9,.2,1)'
     })
   }
-  
+
   const onLeave = () => {
-    setStyle({ 
-      transform: 'translate(0,0) scale(1)', 
-      transition: 'transform 250ms cubic-bezier(.2,.9,.2,1)' 
+    setStyle({
+      transform: 'translate(0,0) scale(1)',
+      transition: 'transform 250ms cubic-bezier(.2,.9,.2,1)'
     })
   }
-  
+
   return (
     <div ref={ref} onMouseMove={onMove} onMouseLeave={onLeave} style={style}>
       {children}
@@ -68,12 +68,34 @@ export default function Navbar() {
   const active = useActiveSection(LINKS.map((l) => l.id))
   const [open, setOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
+  const [theme, setTheme] = useState<"dark" | "light">("dark")
+
+  const toggleTheme = () => {
+    const nextTheme = theme === "dark" ? "light" : "dark"
+
+    setTheme(nextTheme)
+
+    document.documentElement.classList.remove("dark", "light")
+    document.documentElement.classList.add(nextTheme)
+
+    localStorage.setItem("theme", nextTheme)
+  }
 
   useEffect(() => {
     const on = () => setScrolled(window.scrollY > 20)
     on()
     window.addEventListener('scroll', on, { passive: true })
     return () => window.removeEventListener('scroll', on)
+  }, [])
+
+  useEffect(() => {
+    const savedTheme =
+      (localStorage.getItem("theme") as "dark" | "light") || "dark"
+
+    setTheme(savedTheme)
+
+    document.documentElement.classList.remove("dark", "light")
+    document.documentElement.classList.add(savedTheme)
   }, [])
 
   const brand = useMemo(
@@ -93,11 +115,10 @@ export default function Navbar() {
     <div className="relative">
       <header className="fixed top-0 left-0 right-0 z-50">
         <div
-          className={`mx-4 mt-4 rounded-2xl border transition-all duration-300 ${
-            scrolled 
-              ? 'border-white/10 bg-black/60 backdrop-blur-2xl shadow-lg shadow-black/20' 
-              : 'border-white/5 bg-black/20 backdrop-blur-sm'
-          }`}
+          className={`mx-4 mt-4 rounded-2xl border transition-all duration-300 ${scrolled
+            ? 'border-gray-300 dark:border-white/10 bg-white/90 dark:bg-black/55 backdrop-blur-2xl shadow-lg'
+            : 'border-gray-200 dark:border-white/5 bg-white/70 dark:bg-black/25 backdrop-blur-sm'
+            }`}
         >
           <nav className="flex items-center justify-between px-5 md:px-7 h-16 md:h-[72px]">
             {/* Left: Brand with gradient */}
@@ -113,18 +134,17 @@ export default function Navbar() {
                   <a
                     key={l.id}
                     href={`#${l.id}`}
-                    className={`relative px-4 py-2.5 text-[15px] font-medium rounded-xl transition-all duration-200 ${
-                      isActive 
-                        ? 'text-white' 
-                        : 'text-gray-400 hover:text-white'
-                    }`}
+                    className={`relative px-4 py-2.5 text-[15px] font-medium rounded-xl transition-all duration-200 ${isActive
+                      ? 'text-black dark:text-white'
+                      : 'text-gray-800 dark:text-white hover:text-cyan-500 dark:hover:text-cyan-300'
+                      }`}
                   >
                     {l.label}
                     {isActive && (
                       <motion.span
                         layoutId="nav-active"
                         className="absolute inset-0 -z-10 rounded-xl border border-white/10"
-                        style={{ 
+                        style={{
                           background: 'linear-gradient(135deg, rgba(34,211,238,0.1), rgba(168,85,247,0.08))',
                           boxShadow: '0 0 20px rgba(34,211,238,0.1)'
                         }}
@@ -137,37 +157,56 @@ export default function Navbar() {
             </div>
 
             {/* Right: Enhanced CTA button */}
-            <div className="hidden md:block">
+            <div className="hidden md:flex items-center gap-3">
+              <button
+                onClick={toggleTheme}
+                className="h-11 w-11 rounded-xl border border-gray-300 dark:border-white/10 bg-white dark:bg-white/5 text-black dark:text-white"
+              >
+                {theme === "dark" ? "☀️" : "🌙"}
+              </button>
               <Magnetic>
                 <a
                   href="#contact"
                   className="relative inline-flex items-center gap-2.5 px-5 py-2.5 rounded-xl text-[15px] font-semibold overflow-hidden group"
                   style={{
-                    background: 'linear-gradient(135deg, rgba(34,211,238,0.15), rgba(168,85,247,0.15))',
-                    border: '1px solid rgba(255,255,255,0.1)'
+                    background:
+                      theme === "light"
+                        ? "linear-gradient(135deg,#06b6d4,#3b82f6)"
+                        : "linear-gradient(135deg,rgba(34,211,238,.15),rgba(168,85,247,.15))",
+
+                    border:
+                      theme === "light"
+                        ? "1px solid rgba(59,130,246,.25)"
+                        : "1px solid rgba(255,255,255,.1)"
                   }}
                 >
                   {/* Animated gradient background on hover */}
-                  <span 
+                  <span
                     className="absolute inset-0 bg-gradient-to-r from-cyan-500/20 to-purple-500/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
                   />
-                  
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" className="relative z-10">
-                    <path 
-                      d="M5 12h14M12 5l7 7-7 7" 
-                      stroke="url(#gradient)" 
-                      strokeWidth="2" 
-                      strokeLinecap="round" 
+
+                  <svg
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    className={`relative z-10 ${theme === "light" ? "text-white" : "text-cyan-300"
+                      }`}
+                  >
+                    <path
+                      d="M5 12h14M12 5l7 7-7 7"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
                       strokeLinejoin="round"
                     />
-                    <defs>
-                      <linearGradient id="gradient" x1="0" y1="0" x2="1" y2="1">
-                        <stop offset="0" stopColor="#22d3ee" />
-                        <stop offset="1" stopColor="#a855f7" />
-                      </linearGradient>
-                    </defs>
                   </svg>
-                  <span className="relative z-10">Let's Talk</span>
+                  <span
+                    className={`relative z-10 ${theme === "light"
+                      ? "text-white"
+                      : "text-white"
+                      }`}
+                  >Let's Talk</span>
                 </a>
               </Magnetic>
             </div>
@@ -176,14 +215,14 @@ export default function Navbar() {
             <button
               onClick={() => setOpen((v) => !v)}
               aria-label="Toggle menu"
-              className="md:hidden h-11 w-11 grid place-items-center rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 transition-colors backdrop-blur-sm"
+              className="md:hidden h-11 w-11 grid place-items-center rounded-xl border border-gray-300 dark:border-white/10 bg-white dark:bg-white/5 text-black dark:text-white hover:bg-white/10 transition-colors backdrop-blur-sm"
             >
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" className="text-gray-300">
-                <path 
-                  d="M4 7h16M4 12h16M4 17h16" 
-                  stroke="currentColor" 
-                  strokeWidth="2" 
-                  strokeLinecap="round" 
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" className={theme === "light" ? "text-gray-800" : "text-white"}>
+                <path
+                  d="M4 7h16M4 12h16M4 17h16"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
                 />
               </svg>
             </button>
@@ -202,15 +241,15 @@ export default function Navbar() {
         className="fixed inset-0 z-40 md:hidden"
       >
         {/* Backdrop with blur */}
-        <motion.div 
+        <motion.div
           variants={{
             open: { opacity: 1 },
             closed: { opacity: 0 }
           }}
-          className="absolute inset-0 bg-black/80 backdrop-blur-sm" 
-          onClick={() => setOpen(false)} 
+          className="absolute inset-0 bg-black/80 backdrop-blur-sm"
+          onClick={() => setOpen(false)}
         />
-        
+
         {/* Drawer panel */}
         <motion.div
           variants={{
@@ -223,21 +262,40 @@ export default function Navbar() {
           {/* Header */}
           <div className="flex items-center justify-between pb-6 border-b border-white/10">
             {brand}
-            <button
-              onClick={() => setOpen(false)}
-              aria-label="Close menu"
-              className="h-11 w-11 grid place-items-center rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 transition-colors"
-            >
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" className="text-gray-300">
-                <path 
-                  d="M6 6l12 12M18 6L6 18" 
-                  stroke="currentColor" 
-                  strokeWidth="2" 
-                  strokeLinecap="round" 
-                />
-              </svg>
-            </button>
+
+            <div className="flex items-center gap-2">
+              <button
+                onClick={toggleTheme}
+                className="h-11 w-11 rounded-xl border border-gray-300 dark:border-white/10 bg-white dark:bg-white/5 text-lg text-black dark:text-white"
+              >
+                {theme === "dark" ? "☀️" : "🌙"}
+              </button>
+
+              <button
+                onClick={() => setOpen(false)}
+                aria-label="Close menu"
+                className="h-11 w-11 grid place-items-center rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 transition-colors"
+              >
+                <svg
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  className={theme === "light"
+                    ? "text-gray-800"
+                    : "text-white"}
+                >
+                  <path
+                    d="M6 6L18 18M18 6L6 18"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                  />
+                </svg>
+              </button>
+            </div>
           </div>
+
 
           {/* Navigation links */}
           <div className="mt-8 flex flex-col gap-2">
@@ -261,18 +319,21 @@ export default function Navbar() {
             <a
               href="#contact"
               onClick={() => setOpen(false)}
-              className="flex items-center justify-center gap-2.5 px-5 py-3.5 rounded-xl font-semibold text-white transition-all"
+              className={`flex items-center justify-center gap-2.5 px-5 py-3.5 rounded-xl font-semibold ${theme === "light"
+                ? "text-white"
+                : "text-white"
+                }`}
               style={{
                 background: 'linear-gradient(135deg, rgba(34,211,238,0.2), rgba(168,85,247,0.2))',
                 border: '1px solid rgba(255,255,255,0.15)'
               }}
             >
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-                <path 
-                  d="M5 12h14M12 5l7 7-7 7" 
-                  stroke="url(#gradient2)" 
-                  strokeWidth="2" 
-                  strokeLinecap="round" 
+                <path
+                  d="M5 12h14M12 5l7 7-7 7"
+                  stroke="url(#gradient2)"
+                  strokeWidth="2"
+                  strokeLinecap="round"
                   strokeLinejoin="round"
                 />
                 <defs>
@@ -287,6 +348,6 @@ export default function Navbar() {
           </div>
         </motion.div>
       </motion.aside>
-    </div>
+    </div >
   )
 }
