@@ -212,20 +212,38 @@ export default function Navbar() {
             </div>
 
             {/* Mobile toggle - Enhanced */}
-            <button
-              onClick={() => setOpen((v) => !v)}
-              aria-label="Toggle menu"
-              className="md:hidden h-11 w-11 grid place-items-center rounded-xl border border-gray-300 dark:border-white/10 bg-white dark:bg-white/5 text-black dark:text-white hover:bg-white/10 transition-colors backdrop-blur-sm"
-            >
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" className={theme === "light" ? "text-gray-800" : "text-white"}>
-                <path
-                  d="M4 7h16M4 12h16M4 17h16"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                />
-              </svg>
-            </button>
+            {/* Mobile Controls */}
+            <div className="md:hidden flex items-center gap-2">
+
+              <button
+                onClick={toggleTheme}
+                className="h-11 w-11 grid place-items-center rounded-xl border border-gray-300 dark:border-white/10 bg-white dark:bg-white/5 text-black dark:text-white"
+              >
+                {theme === "dark" ? "☀️" : "🌙"}
+              </button>
+
+              <button
+                onClick={() => setOpen((v) => !v)}
+                aria-label="Toggle menu"
+                className="h-11 w-11 grid place-items-center rounded-xl border border-gray-300 dark:border-white/10 bg-white dark:bg-white/5 text-black dark:text-white hover:bg-white/10 transition-colors backdrop-blur-sm"
+              >
+                <svg
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  className={theme === "light" ? "text-gray-800" : "text-white"}
+                >
+                  <path
+                    d="M4 7h16M4 12h16M4 17h16"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                  />
+                </svg>
+              </button>
+
+            </div>
           </nav>
         </div>
       </header>
@@ -264,12 +282,6 @@ export default function Navbar() {
             {brand}
 
             <div className="flex items-center gap-2">
-              <button
-                onClick={toggleTheme}
-                className="relative z-50 h-11 w-11 rounded-xl border border-gray-300 dark:border-white/10 bg-white dark:bg-white/5 text-lg text-black dark:text-white"
-              >
-                {theme === "dark" ? "☀️" : "🌙"}
-              </button>
 
               <button
                 onClick={() => setOpen(false)}
