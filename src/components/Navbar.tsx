@@ -260,13 +260,13 @@ export default function Navbar() {
           className="absolute right-0 top-0 h-full w-[85%] max-w-sm bg-black/90 backdrop-blur-2xl border-l border-white/10 p-6"
         >
           {/* Header */}
-          <div className="flex items-center justify-between pb-6 border-b border-white/10">
+          <div className="relative z-50 flex items-center justify-between pb-6 border-b border-white/10">
             {brand}
 
             <div className="flex items-center gap-2">
               <button
                 onClick={toggleTheme}
-                className="h-11 w-11 rounded-xl border border-gray-300 dark:border-white/10 bg-white dark:bg-white/5 text-lg text-black dark:text-white"
+                className="relative z-50 h-11 w-11 rounded-xl border border-gray-300 dark:border-white/10 bg-white dark:bg-white/5 text-lg text-black dark:text-white"
               >
                 {theme === "dark" ? "☀️" : "🌙"}
               </button>
@@ -274,7 +274,7 @@ export default function Navbar() {
               <button
                 onClick={() => setOpen(false)}
                 aria-label="Close menu"
-                className="h-11 w-11 grid place-items-center rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 transition-colors"
+                className="relative z-50 h-11 w-11 grid place-items-center rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 transition-colors"
               >
                 <svg
                   width="20"
