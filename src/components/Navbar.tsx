@@ -275,7 +275,10 @@ export default function Navbar() {
             closed: { x: '100%' }
           }}
           transition={{ type: 'spring', stiffness: 300, damping: 30 }}
-          className="absolute right-0 top-0 h-full w-[85%] max-w-sm bg-black/90 backdrop-blur-2xl border-l border-white/10 p-6"
+          className={`absolute right-0 top-0 h-full w-[85%] max-w-sm backdrop-blur-2xl p-6 ${theme === "light"
+            ? "bg-white/95 border-l border-gray-200"
+            : "bg-black/90 border-l border-white/10"
+            }`}
         >
           {/* Header */}
           <div className="relative z-50 flex items-center justify-between pb-6 border-b border-white/10">
@@ -286,7 +289,10 @@ export default function Navbar() {
               <button
                 onClick={() => setOpen(false)}
                 aria-label="Close menu"
-                className="relative z-50 h-11 w-11 grid place-items-center rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 transition-colors"
+                className={`relative z-50 h-11 w-11 grid place-items-center rounded-xl transition-colors ${theme === "light"
+                    ? "bg-gray-100 border border-gray-300 hover:bg-gray-200"
+                    : "bg-white/5 border border-white/10 hover:bg-white/10"
+                  }`}
               >
                 <svg
                   width="20"
@@ -319,7 +325,10 @@ export default function Navbar() {
                 initial={{ opacity: 0, x: 20 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: index * 0.05 }}
-                className="px-4 py-3.5 rounded-xl text-base font-medium text-gray-300 hover:text-white hover:bg-white/5 border border-transparent hover:border-white/10 transition-all"
+                className={`px-4 py-3.5 rounded-xl text-base font-medium transition-all ${theme === "light"
+                  ? "text-gray-700 hover:text-cyan-600 hover:bg-gray-100"
+                  : "text-gray-300 hover:text-white hover:bg-white/5"
+                  }`}
               >
                 {l.label}
               </motion.a>

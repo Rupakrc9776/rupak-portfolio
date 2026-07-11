@@ -120,35 +120,37 @@ section {
   overflow-x: hidden;
 }
 
-/* Light Theme */
+/* ===========================
+   THEME SYSTEM
+=========================== */
+
+:root{
+  color-scheme: light dark;
+
+  --bg:248 250 252;
+  --text-color:#111827;
+}
+
 html.light,
 html.light body,
-html.light #root {
-  background: #ffffff;
-  color: #111827;
+html.light #root{
+  color-scheme: light;
+
+  background:#ffffff;
+  color:#111827;
+
+  --bg:248 250 252;
+  --text-color:#111827;
 }
 
 html.dark,
 html.dark body,
-html.dark #root {
-  background: #000000;
-  color: #ffffff;
-}
+html.dark #root{
+  color-scheme: dark;
 
-:root{
-  --bg:255,255,255;
-  --text-color:#111827;
-}
+  background:#000000;
+  color:#ffffff;
 
-.light{
-  --skills-bg:#f8fafc;
-  --skills-text:#111827;
-}
-
-:root{
-  --bg:255 255 255;
-}
-
-.dark{
-  --bg:0 0 0;
+  --bg:5 8 22;
+  --text-color:#ffffff;
 }

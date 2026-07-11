@@ -158,8 +158,38 @@ export default function Contact() {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
+
     if (!formRef.current) return
 
+    const form = formRef.current
+
+    const name = (
+      form.elements.namedItem("user_name") as HTMLInputElement
+    ).value.trim()
+
+    const email = (
+      form.elements.namedItem("user_email") as HTMLInputElement
+    ).value.trim()
+
+    const message = (
+      form.elements.namedItem("message") as HTMLTextAreaElement
+    ).value.trim()
+
+    // Required validation
+    if (!name || !email || !message) {
+      alert("Please fill all fields.")
+      return
+    }
+
+    // Email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+
+    if (!emailRegex.test(email)) {
+      alert("Please enter a valid email address.")
+      return
+    }
+
+    // EmailJS config validation
     if (!EMAILJS_SERVICE_ID || !EMAILJS_TEMPLATE_ID || !EMAILJS_PUBLIC_KEY) {
       console.error("EmailJS config missing.")
       setStatus("error")
@@ -174,13 +204,14 @@ export default function Contact() {
       await emailjs.sendForm(
         EMAILJS_SERVICE_ID,
         EMAILJS_TEMPLATE_ID,
-        formRef.current,
+        form,
         EMAILJS_PUBLIC_KEY
       )
+
       setStatus("success")
-      formRef.current.reset()
+      form.reset()
     } catch (err) {
-      console.error("[EmailJS] sendForm error:", err)
+      console.error(err)
       setStatus("error")
     } finally {
       setIsSubmitting(false)
@@ -375,7 +406,6 @@ export default function Contact() {
               ref={formRef}
               onSubmit={handleSubmit}
               className="mt-6 space-y-5"
-              noValidate
             >
               <InputField
                 label="Name"

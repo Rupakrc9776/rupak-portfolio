@@ -84,8 +84,8 @@ export default function GlobalLayers({ showCursorGlow = true }: { showCursorGlow
       ctx.clearRect(0, 0, w, h)
       ctx.globalCompositeOperation = 'lighter'
       ctx.fillStyle = isLight
-        ? 'rgba(0,0,0,0.06)'
-        : 'rgba(255,255,255,0.10)'
+        ? 'rgba(0,0,0,0.02)'
+        : 'rgba(255,255,255,0.08)'
       for (let i = 0; i < N; i++) {
         const p = P[i]
         p.x += p.vx
@@ -114,34 +114,24 @@ export default function GlobalLayers({ showCursorGlow = true }: { showCursorGlow
   return (
     <>
       {/* Background planes that change color by active section */}
-      <div className="absolute inset-0 -z-10" aria-hidden>
+      <div className="fixed inset-0 -z-50 pointer-events-none" aria-hidden>
         <div
           data-plane
-          className={`absolute -left-24 -top-16 w-[60rem] h-[28rem] rounded-[48px] ${isLight ? "opacity-[0.10]" : "opacity-[0.20]"
+          className={`absolute -left-24 -top-16 w-[60rem] h-[28rem] rounded-[48px] ${isLight ? "opacity-[0.04]" : "opacity-[0.20]"
             }`}
           style={{ background: `radial-gradient(closest-side, ${theme.a}, transparent 65%)`, filter: 'blur(24px)' }}
         />
         <div
           data-plane
-          className={`absolute right-[-18rem] top-[8rem] w-[56rem] h-[28rem] rounded-[48px] ${isLight ? "opacity-[0.10]" : "opacity-[0.20]"
+          className={`absolute right-[-18rem] top-[8rem] w-[56rem] h-[28rem] rounded-[48px] ${isLight ? "opacity-[0.04]" : "opacity-[0.20]"
             }`}
           style={{ background: `radial-gradient(closest-side, ${theme.b}, transparent 65%)`, filter: 'blur(24px)' }}
         />
         <div
           data-plane
-          className={`absolute left-[10%] bottom-[8%] w-[36rem] h-[20rem] rounded-[48px] ${isLight ? "opacity-[0.10]" : "opacity-[0.20]"
+          className={`absolute left-[10%] bottom-[8%] w-[36rem] h-[20rem] rounded-[48px] ${isLight ? "opacity-[0.04]" : "opacity-[0.20]"
             }`}
           style={{ background: `radial-gradient(closest-side, ${theme.c}, transparent 65%)`, filter: 'blur(22px)' }}
-        />
-
-        {/* subtle bottom vignette */}
-        <div
-          className="absolute left-0 bottom-0 right-0 h-40 pointer-events-none"
-          style={{
-            background: isLight
-              ? "linear-gradient(180deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.55) 80%)"
-              : "linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0.45) 80%)"
-          }}
         />
 
         {/* dust canvas */}

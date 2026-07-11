@@ -13,8 +13,8 @@ gsap.registerPlugin(ScrollTrigger);
 const gridCSS = `
 .light .hero-grid{
 background-image:
-linear-gradient(rgba(0,0,0,.05) 1px,transparent 1px),
-linear-gradient(90deg,rgba(0,0,0,.05) 1px,transparent 1px),
+linear-gradient(rgba(0,0,0,.08) 1px,transparent 1px),
+linear-gradient(90deg,rgba(0,0,0,.08) 1px,transparent 1px),
 radial-gradient(ellipse at 50% 120%,rgba(0,0,0,.02),transparent 60%);
 }
 
@@ -538,7 +538,10 @@ export default function Hero() {
       ref={rootRef}
       id="hero"
       aria-label="Hero Section"
-      className="relative min-h-[100svh] w-full overflow-hidden bg-[rgb(var(--bg))] text-black dark:text-white transition-colors duration-500"
+      className={`relative min-h-[100svh] w-full overflow-hidden transition-colors duration-500 ${isLight
+        ? "bg-[#f8fafc] text-black"
+        : "bg-[#050816] text-white"
+        }`}
     >
       {/* Grid + runway */}
       <div ref={warpRef} className="absolute inset-0 will-change-transform">
@@ -591,10 +594,16 @@ export default function Hero() {
       {/* Foreground content */}
       <div className="relative hero-content z-10 flex min-h-[100svh] items-center justify-center px-6">
         <div className="text-center max-w-6xl mx-auto">
-          <h1 className="text-5xl sm:text-6xl md:text-8xl lg:text-9xl font-semibold tracking-tight text-black dark:text-white transition-colors">
+          <h1
+            className={`text-5xl sm:text-6xl md:text-8xl lg:text-9xl font-semibold tracking-tight transition-colors ${isLight ? "text-gray-900" : "text-white"
+              }`}
+          >
             Rupak Chatterjee
           </h1>
-          <p className="mt-6 text-gray-600 dark:text-gray-300 text-lg sm:text-xl md:text-2xl lg:text-3xl font-medium transition-colors">
+          <p
+            className={`mt-6 text-lg sm:text-xl md:text-2xl lg:text-3xl font-medium transition-colors ${isLight ? "text-gray-700" : "text-gray-300"
+              }`}
+          >
             Electrical Engineering Student, Developer & Tech Enthusiast
           </p>
 
@@ -602,12 +611,18 @@ export default function Hero() {
             <a href="#contact" className="px-8 py-3 rounded-full bg-gradient-to-r from-cyan-500 to-blue-600 text-white hover:scale-105 hover:shadow-xl hover:shadow-cyan-500/30 transition-all duration-300">
               Contact Me
             </a>
-            <a href="/Resume.pdf" target="_blank" rel="noreferrer" className="px-8 py-3 rounded-full border border-gray-400 border border-gray-400 dark:border-white/20 backdrop-blur-md hover:bg-gray-100 dark:hover:bg-white/10 transition-all duration-300">
+            <a href="/Resume.pdf" target="_blank" rel="noreferrer" className={`px-8 py-3 rounded-full backdrop-blur-md transition-all duration-300 ${isLight
+              ? "border border-gray-300 hover:bg-gray-100"
+              : "border border-white/20 hover:bg-white/10"
+              }`}>
               Resume ↗
             </a>
           </div>
 
-          <div className="hero-social mt-8 flex items-center justify-center gap-6 text-gray-700 dark:text-gray-400 transition-colors text-2xl">
+          <div className={`hero-social mt-8 flex items-center justify-center gap-6 text-2xl transition-colors ${isLight
+              ? "text-gray-700"
+              : "text-gray-400"
+            }`}>
             <a className="transition-all duration-300 hover:scale-110" href="https://github.com/Rupakrc9776" target="_blank" rel="noreferrer" aria-label="GitHub" title="GitHub">
               <FaGithub />
             </a>
@@ -623,10 +638,14 @@ export default function Hero() {
 
       {/* Scroll indicator */}
       <div className="absolute bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 z-10">
-        <div className="w-6 h-10 rounded-full border-2 border-gray-500 dark:border-gray-500/30 flex items-start justify-center p-1">
+        <div className={`w-6 h-10 rounded-full border-2 flex items-start justify-center p-1 ${isLight
+          ? "border-gray-400"
+          : "border-white/30"
+          }`}>
           <div className="w-2 h-2 rounded-full bg-cyan-400 animate-bounce" />
         </div>
-        <span className="text-xs text-gray-700 dark:text-gray-400">Scroll</span>
+        <span className={`text-xs ${isLight ? "text-gray-600" : "text-gray-400"
+          }`}>Scroll</span>
       </div>
     </section>
   );

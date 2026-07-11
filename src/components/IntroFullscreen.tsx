@@ -159,7 +159,7 @@ export default function IntroFullscreen({
   return (
     <div
       ref={rootRef}
-      className="fixed inset-0 z- bg-black text-white overflow-hidden"
+      className="fixed inset-0 z-50 bg-black text-white overflow-hidden"
       aria-label="Intro"
       role="dialog"
       aria-modal="true"

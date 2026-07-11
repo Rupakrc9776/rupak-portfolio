@@ -69,6 +69,25 @@ export default function AboutHeroFull() {
   const accents = useMemo(() => ["#22d3ee", "#a78bfa", "#34d399"], []);
   const [activeTab, setActiveTab] = useState<"education" | "achievements">("education");
 
+  const [isLight, setIsLight] = useState(false);
+
+  useEffect(() => {
+    const updateTheme = () => {
+      setIsLight(document.documentElement.classList.contains("light"));
+    };
+
+    updateTheme();
+
+    const observer = new MutationObserver(updateTheme);
+
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ["class"],
+    });
+
+    return () => observer.disconnect();
+  }, []);
+
   return (
     <section
       className="relative w-full max-w-full overflow-x-hidden text-gray-900 dark:text-white"
@@ -89,14 +108,31 @@ export default function AboutHeroFull() {
               whileInView="show"
               viewport={{ once: true }}
               className={cardBase}
+              style={{
+                background: isLight
+                  ? "rgba(255,255,255,.92)"
+                  : "rgba(255,255,255,.08)",
+
+                border: isLight
+                  ? "1px solid rgba(203,213,225,.8)"
+                  : "1px solid rgba(255,255,255,.15)",
+
+                boxShadow: isLight
+                  ? "0 12px 36px rgba(15,23,42,.10)"
+                  : "0 12px 36px rgba(0,0,0,.35)",
+              }}
             >
-              <Tabs active={activeTab} onChange={setActiveTab} accents={accents} />
+              <Tabs active={activeTab} onChange={setActiveTab} accents={accents} isLight={isLight} />
               <div className="p-4 sm:p-5 md:p-6">
                 <AnimatePresence mode="wait">
                   {activeTab === "education" ? (
-                    <EducationTimeline key="education" accents={accents} />
+                    <EducationTimeline
+                      key="education"
+                      accents={accents}
+                      isLight={isLight}
+                    />
                   ) : (
-                    <AchievementsGrid key="achievements" />
+                    <AchievementsGrid key="achievements" isLight={isLight} />
                   )}
                 </AnimatePresence>
               </div>
@@ -106,7 +142,7 @@ export default function AboutHeroFull() {
           {/* RIGHT */}
           <div className="space-y-4 sm:space-y-5">
             <div className="w-full max-w-full lg:max-w-[760px] mx-auto">
-              <GeekforgeeksStats accents={accents} />
+              <GeekforgeeksStats accents={accents} isLight={isLight} />
             </div>
             <div className="w-full max-w-full lg:max-w-[760px] mx-auto">
               <GitHubStats accents={accents} />
@@ -396,7 +432,7 @@ const BackgroundBeams = memo(function BackgroundBeams({ accents }: { accents: st
   }, []);
 
   return (
-    <div className="absolute inset-0 -z-10 overflow-x-hidden">
+    <div className="absolute inset-0 -z-20 overflow-x-hidden">
       <div
         className="absolute inset-0 max-w-full"
         style={{
@@ -445,10 +481,12 @@ function Tabs({
   active,
   onChange,
   accents,
+  isLight,
 }: {
   active: "education" | "achievements";
   onChange: (t: "education" | "achievements") => void;
   accents: string[];
+  isLight: boolean;
 }) {
   return (
     <div className="flex border-b border-gray-300 dark:border-white/20">
@@ -458,6 +496,7 @@ function Tabs({
         icon="🎓"
         label="Education"
         accents={accents}
+        isLight={isLight}
       />
       <TabButton
         active={active === "achievements"}
@@ -465,6 +504,7 @@ function Tabs({
         icon="🏆"
         label="Achievements"
         accents={accents}
+        isLight={isLight}
       />
     </div>
   );
@@ -476,17 +516,19 @@ const TabButton = memo(function TabButton({
   icon,
   label,
   accents,
+  isLight,
 }: {
   active: boolean;
   onClick: () => void;
   icon: string;
   label: string;
   accents: string[];
+  isLight: boolean;
 }) {
   return (
     <button
       onClick={onClick}
-      className="relative flex-1 px-4 py-3 sm:px-5 sm:py-3.5 font-semibold text-sm transition-all duration-300"
+      className="relative flex-1 px-4 py-3 sm:px-5 sm:py-3.5 font-bold text-sm transition-all duration-300 hover:bg-white/5"
     >
       {active && (
         <motion.div
@@ -496,7 +538,9 @@ const TabButton = memo(function TabButton({
           transition={{ type: "spring", bounce: 0.2, duration: 0.45 }}
         />
       )}
-      <span className={`flex items-center justify-center gap-2 ${active ? "text-gray-900 dark:text-white" : "text-gray-700 dark:text-neutral-300"}`}>
+      <span
+        className={`flex items-center justify-center gap-2 ${active ? (isLight ? "text-gray-900" : "text-white") : (isLight ? "text-gray-700" : "text-neutral-300")}`}
+      >
         <span className="text-xl">{icon}</span>
         {label}
       </span>
@@ -516,7 +560,10 @@ type EducationItem = {
   icon?: string;
 };
 
-function EducationTimeline({ accents }: { accents: string[] }) {
+function EducationTimeline({ accents, isLight }: {
+  accents: string[];
+  isLight: boolean;
+}) {
   const education: EducationItem[] = [
     {
       period: "2024–2028",
@@ -550,9 +597,7 @@ function EducationTimeline({ accents }: { accents: string[] }) {
         <div
           className="h-full w-[2px]"
           style={{
-            background: document.documentElement.classList.contains("light")
-              ? "linear-gradient(180deg,#22d3ee 0%,#06b6d4 50%,#a855f7 100%)"
-              : "linear-gradient(180deg,#a855f7 0%,#06b6d4 50%,#22d3ee 100%)"
+            background: `linear-gradient(to bottom, ${accents[0]}, ${accents[1]})`,
           }}
         />
       </div>
@@ -568,12 +613,20 @@ function EducationTimeline({ accents }: { accents: string[] }) {
             >
               <div className={`${leftSide ? "md:col-start-1" : "md:col-start-2"} max-w-full`}>
                 <motion.div
-                  whileHover={{ y: -1 }}
+                  whileHover={{
+                    scale: 1.02,
+                    y: -4
+                  }}
                   transition={{ type: "spring", stiffness: 260, damping: 20 }}
                   className="relative z-20 rounded-xl border border-gray-300 dark:border-white/25 bg-white/80 dark:bg-white/10 backdrop-blur-xl px-4 sm:px-5 py-4 sm:py-5 shadow-[0_10px_30px_rgba(0,0,0,0.08)] dark:shadow-[0_10px_30px_rgba(255,255,255,0.06)] max-w-full overflow-hidden"
+                  style={{
+                    background: isLight ? "rgba(255,255,255,0.95)" : "rgba(255,255,255,0.10)",
+                    borderColor: isLight ? "rgba(203,213,225,0.8)" : "rgba(255,255,255,0.15)",
+                    color: isLight ? "#111827" : "#ffffff",
+                  }}
                 >
                   <span
-                    className="absolute top-1/2 -translate-y-1/2 hidden md:block w-2.5 h-2.5 rounded-full border border-cyan-300 dark:border-white/40"
+                    className={`absolute top-1/2 -translate-y-1/2 hidden md:block w-2.5 h-2.5 rounded-full border ${isLight ? "border-cyan-400" : "border-white/40"}`}
                     style={{
                       backgroundColor: e.color,
                       left: leftSide ? ("calc(100% + 10px)" as string) : undefined,
@@ -607,12 +660,12 @@ function EducationTimeline({ accents }: { accents: string[] }) {
                         >
                           {e.period}
                         </span>
-                        <span className="text-xs text-gray-600 dark:text-neutral-300">•</span>
-                        <span className="text-xs text-gray-600 dark:text-neutral-300">Secured {e.cgpa}</span>
+                        <span className="text-xs" style={{ color: isLight ? "#64748b" : "rgba(255,255,255,0.75)" }}>•</span>
+                        <span className="text-xs" style={{ color: isLight ? "#64748b" : "rgba(255,255,255,0.75)" }}>Secured {e.cgpa}</span>
                       </div>
-                      <h4 className="mt-1 text-base sm:text-lg font-bold text-gray-900 dark:text-white">{e.degree}</h4>
-                      <p className={tinyMuted.replace("100/80", "100/85")}>{e.institution}</p>
-                      <div className="mt-3 h-1 w-full overflow-hidden rounded-full bg-gray-200 dark:bg-white/15">
+                      <h4 className="mt-1 text-base sm:text-lg font-bold" style={{ color: isLight ? "#111827" : "#ffffff" }}>{e.degree}</h4>
+                      <p className={tinyMuted.replace("100/80", "100/85")} style={{ color: isLight ? "#475569" : "#e5e7eb" }}>{e.institution}</p>
+                      <div className="mt-3 h-1 w-full overflow-hidden rounded-full" style={{ background: isLight ? "rgba(226,232,240,0.9)" : "rgba(255,255,255,0.15)" }}>
                         <motion.div
                           variants={barGrow("100%")}
                           initial="hidden"
@@ -638,7 +691,7 @@ function EducationTimeline({ accents }: { accents: string[] }) {
 /* -------------------------
    AchievementsGrid
    ------------------------- */
-const AchievementsGrid = memo(function AchievementsGrid() {
+const AchievementsGrid = memo(function AchievementsGrid({ isLight }: { isLight: boolean }) {
   // for now all same image, later change per card
   const achievements: { title: string; subtitle: string; image: string }[] = [
     { title: "Complete The Specialized Workshop", subtitle: "Building Real-Time Surplus Engine With Gemini & AlloyDB", image: "/Building Real-Time Surplus Engine With Gemini & AlloyDB.jpg" },
@@ -696,10 +749,21 @@ const AchievementsGrid = memo(function AchievementsGrid() {
           <motion.div
             key={`${item.title}-${idx}`}
             initial={{ scale: 1, opacity: 1 }}
-            whileHover={!isTouch ? { scale: 1.02 } : {}}
+            whileHover={
+              !isTouch
+                ? {
+                  scale: 1.02,
+                  y: -4
+                }
+                : {}
+            }
             transition={{ duration: 0.25 }}
             className="group relative rounded-xl border border-gray-300 dark:border-white/20 bg-white/80 dark:bg-white/10 backdrop-blur-xl overflow-hidden cursor-pointer shadow-[0_10px_30px_rgba(0,0,0,0.08)] dark:shadow-[0_10px_30px_rgba(255,255,255,0.06)]"
-            style={{ minHeight: 140 }}
+            style={{
+              minHeight: 140,
+              background: isLight ? "rgba(255,255,255,0.95)" : "rgba(255,255,255,0.10)",
+              borderColor: isLight ? "rgba(203,213,225,0.8)" : "rgba(255,255,255,0.15)",
+            }}
             onClick={() =>
               setSelectedCertificate({
                 image: item.image,
@@ -710,10 +774,10 @@ const AchievementsGrid = memo(function AchievementsGrid() {
             {/* Text content – always visible */}
             <div className="relative z-10 p-3.5">
               <div className="flex items-center justify-between mb-1.5">
-                <h4 className="text-sm font-semibold text-gray-900 dark:text-white">{item.title}</h4>
-                <div className="text-xs text-gray-600 dark:text-neutral-200">🏅</div>
+                <h4 className="text-sm font-semibold" style={{ color: isLight ? "#111827" : "#ffffff" }}>{item.title}</h4>
+                <div className="text-xs" style={{ color: isLight ? "#64748b" : "rgba(255,255,255,0.8)" }}>🏅</div>
               </div>
-              <p className="text-xs text-gray-600 dark:text-neutral-300">{item.subtitle}</p>
+              <p className="text-xs" style={{ color: isLight ? "#475569" : "#e5e7eb" }}>{item.subtitle}</p>
             </div>
 
             {/* DESKTOP: image slides up on hover */}
@@ -750,9 +814,9 @@ const AchievementsGrid = memo(function AchievementsGrid() {
                       loading="lazy"
                       className="w-full h-40 object-cover"
                     />
-                    <div className="p-3 text-gray-900 dark:text-white bg-black/60 backdrop-blur-sm">
+                    <div className="p-3 backdrop-blur-sm" style={{ background: isLight ? "rgba(255,255,255,0.92)" : "rgba(0,0,0,0.6)", color: isLight ? "#111827" : "#ffffff" }}>
                       <h4 className="font-bold text-sm">{item.title}</h4>
-                      <p className="text-xs text-neutral-100/85 mt-1">
+                      <p className="text-xs mt-1" style={{ color: isLight ? "#475569" : "rgba(255,255,255,0.85)" }}>
                         {item.subtitle}
                       </p>
                     </div>
@@ -781,7 +845,7 @@ const AchievementsGrid = memo(function AchievementsGrid() {
             >
               <button
                 onClick={() => setSelectedCertificate(null)}
-                className="fixed top-5 right-5 z-[10001] bg-red-500/40 backdrop-blur-md text-white px-4 py-2 rounded-lg border border-red-400/30"
+                className="absolute top-5 right-5 z-[10001] bg-red-500/40 backdrop-blur-md text-white px-4 py-2 rounded-lg border border-red-400/30"
               >
                 ✕
               </button>
@@ -794,11 +858,15 @@ const AchievementsGrid = memo(function AchievementsGrid() {
                 Download
               </a>
 
-              <img
-                src={selectedCertificate.image}
-                alt={selectedCertificate.title}
-                className="max-w-full max-h-[65vh] object-contain rounded-xl mx-auto"
-              />
+              <div
+                className="bg-white rounded-xl p-2 shadow-2xl"
+              >
+                <img
+                  src={selectedCertificate.image}
+                  alt={selectedCertificate.title}
+                  className="block max-w-full max-h-[65vh] object-contain rounded-lg"
+                />
+              </div>
 
               <div className="mt-3 text-center text-gray-900 dark:text-white font-semibold">
                 {selectedCertificate.title}
@@ -816,7 +884,8 @@ const AchievementsGrid = memo(function AchievementsGrid() {
 /* -------------------------
    GeekforgeeksStats
    ------------------------- */
-const GeekforgeeksStats = memo(function GeekforgeeksStats({ accents }: { accents: string[] }) {
+const GeekforgeeksStats = memo(function GeekforgeeksStats({ accents, isLight }: { accents: string[]; isLight: boolean }) {
+
   const stats = {
     easy: { solved: 32, total: 1000, beats: 55 },
     medium: { solved: 76, total: 1000, beats: 62 },
@@ -827,7 +896,18 @@ const GeekforgeeksStats = memo(function GeekforgeeksStats({ accents }: { accents
   };
 
   return (
-    <motion.div variants={fadeUp} initial="hidden" whileInView="show" viewport={{ once: true }} className={`${cardBase} p-5 sm:p-6`}>
+    <motion.div
+      variants={fadeUp}
+      initial="hidden"
+      whileInView="show"
+      viewport={{ once: true }}
+      className={`${cardBase} p-5 sm:p-6`}
+      style={{
+        background: isLight ? "rgba(255,255,255,0.95)" : "rgba(255,255,255,0.10)",
+        borderColor: isLight ? "rgba(203,213,225,0.8)" : "rgba(255,255,255,0.15)",
+        color: isLight ? "#111827" : "#ffffff",
+      }}
+    >
       <div className="flex items-center gap-3 mb-4">
         <img
           src={gfglogo}
@@ -843,18 +923,33 @@ const GeekforgeeksStats = memo(function GeekforgeeksStats({ accents }: { accents
           secondary={accents[1]}
           innerTop="133"
           innerBottom="Solved"
+          isLight={isLight}
         />
-        <div className="grid grid-cols-3 gap-2 sm:gap-3 flex-1">
-          <StatBox label="Rank" value={stats.rank} />
-          <StatBox label="Badges" value={stats.badges} />
-          <StatBox label="Reputation" value={stats.reputation} />
+        <div className="grid grid-cols-3 gap-3 flex-1">
+          <StatBox
+            label="Rank"
+            value={stats.rank}
+            isLight={isLight}
+          />
+
+          <StatBox
+            label="Badges"
+            value={stats.badges}
+            isLight={isLight}
+          />
+
+          <StatBox
+            label="Reputation"
+            value={stats.reputation}
+            isLight={isLight}
+          />
         </div>
       </div>
 
       <div className="space-y-3">
-        <ProgressBar label="Easy" solved={stats.easy.solved} total={stats.easy.total} beats={stats.easy.beats} color="#22d3ee" delay={0.2} />
-        <ProgressBar label="Medium" solved={stats.medium.solved} total={stats.medium.total} beats={stats.medium.beats} color="#34d399" delay={0.25} />
-        <ProgressBar label="Hard" solved={stats.hard.solved} total={stats.hard.total} beats={stats.hard.beats} color="#f87171" delay={0.3} />
+        <ProgressBar label="Easy" solved={stats.easy.solved} total={stats.easy.total} beats={stats.easy.beats} color="#22d3ee" delay={0.2} isLight={isLight} />
+        <ProgressBar label="Medium" solved={stats.medium.solved} total={stats.medium.total} beats={stats.medium.beats} color="#34d399" delay={0.25} isLight={isLight} />
+        <ProgressBar label="Hard" solved={stats.hard.solved} total={stats.hard.total} beats={stats.hard.beats} color="#f87171" delay={0.3} isLight={isLight} />
       </div>
     </motion.div>
   );
@@ -868,11 +963,13 @@ const RadialStat = memo(function RadialStat({
   secondary,
   innerTop,
   innerBottom,
+  isLight,
 }: {
   primary: string;
   secondary: string;
   innerTop: string;
   innerBottom: string;
+  isLight: boolean;
 }) {
   return (
     <div className="relative w-20 h-20 sm:w-24 sm:h-24 flex-shrink-0">
@@ -899,24 +996,41 @@ const RadialStat = memo(function RadialStat({
         </defs>
       </svg>
       <div className="absolute inset-0 flex flex-col items-center justify-center">
-        <span className="text-lg font-bold text-gray-900 dark:text-white">{innerTop}</span>
-        <span className="text-[10px] text-gray-700 dark:text-neutral-300">{innerBottom}</span>
+        <span className="text-lg font-bold" style={{ color: isLight ? "#111827" : "#ffffff" }}>{innerTop}</span>
+        <span className="text-[10px]" style={{ color: isLight ? "#475569" : "rgba(255,255,255,0.75)" }}>{innerBottom}</span>
       </div>
     </div>
   );
 });
 
-const StatBox = memo(function StatBox({ label, value }: { label: string; value: string }) {
+const StatBox = memo(function StatBox({
+  label,
+  value,
+  isLight,
+}: {
+  label: string;
+  value: string;
+  isLight: boolean;
+}) {
   return (
     <motion.div
       initial={{ scale: 0.98, opacity: 0 }}
       whileInView={{ scale: 1, opacity: 1 }}
       viewport={{ once: true }}
       transition={{ duration: 0.35 }}
-      className="text-center p-2 rounded-lg bg-white/80 dark:bg-white/10 border border-gray-300 dark:border-white/20 max-w-full"
+      className="rounded-xl p-3 text-center backdrop-blur-xl shadow-[0_10px_30px_rgba(0,0,0,0.08)] dark:shadow-[0_10px_30px_rgba(255,255,255,0.06)] transition-all duration-300"
+      style={{
+        background: isLight
+          ? "rgba(248,250,252,.95)"
+          : "rgba(255,255,255,.08)",
+
+        border: isLight
+          ? "1px solid rgba(203,213,225,.8)"
+          : "1px solid rgba(255,255,255,.15)",
+      }}
     >
-      <div className="text-sm sm:text-base font-bold text-gray-900 dark:text-white">{value}</div>
-      <div className={tinyMuted}>{label}</div>
+      <div className="text-sm sm:text-base font-bold" style={{ color: isLight ? "#111827" : "#ffffff" }}>{value}</div>
+      <div className="text-xs" style={{ color: isLight ? "#475569" : "rgba(255,255,255,0.7)" }}>{label}</div>
     </motion.div>
   );
 });
@@ -928,6 +1042,7 @@ function ProgressBar({
   beats,
   color,
   delay,
+  isLight,
 }: {
   label: string;
   solved: number;
@@ -935,20 +1050,21 @@ function ProgressBar({
   beats: number;
   color: string;
   delay: number;
+  isLight: boolean;
 }) {
   const percentage = (solved / total) * 100;
   return (
     <div className="max-w-full">
       <div className="flex items-center justify-between mb-1.5">
-        <span className="text-sm font-medium text-gray-900 dark:text-white">{label}</span>
-        <div className="flex items-center gap-2 text-xs">
-          <span className="text-gray-600 dark:text-neutral-300">
+        <span className="text-sm font-medium" style={{ color: isLight ? "#111827" : "#f8fafc" }}>{label}</span>
+        <div className="flex items-center gap-2 text-xs" style={{ color: isLight ? "#475569" : "rgba(255,255,255,0.7)" }}>
+          <span>
             {solved}/{total}
           </span>
-          <span className="text-gray-600 dark:text-neutral-300">Beats: {beats}%</span>
+          <span>Beats: {beats}%</span>
         </div>
       </div>
-      <div className="relative h-2 bg-gray-200 dark:bg-white/20 rounded-full overflow-hidden">
+      <div className="relative h-2 rounded-full overflow-hidden" style={{ background: isLight ? "rgba(226,232,240,0.9)" : "rgba(255,255,255,0.15)" }}>
         <motion.div
           variants={barGrow(`${percentage}%`, delay)}
           initial="hidden"
@@ -996,7 +1112,18 @@ const GitHubStats = memo(function GitHubStats({
       initial="hidden"
       whileInView="show"
       viewport={{ once: true }}
-      className={`${cardBase} p-5 sm:p-6`}
+      className="rounded-2xl border backdrop-blur-xl p-5 sm:p-6"
+      style={{
+        background: isLight
+          ? "rgba(255,255,255,0.92)"
+          : "rgba(255,255,255,0.08)",
+
+        borderColor: isLight
+          ? "rgba(203,213,225,.8)"
+          : "rgba(255,255,255,.15)",
+
+        color: isLight ? "#111827" : "#ffffff",
+      }}
     >
       <div className="flex items-center gap-3 mb-6">
         <svg
